@@ -1,0 +1,267 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: #0d1015;
+}
+
+body {
+  background-color: #0d1015;
+  color: #b3bbc7;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  color: #eceef1;
+}
+
+.font-serif,
+.figure-num {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.tnum {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8d97a6;
+}
+
+:focus-visible {
+  outline: 2px solid #eceef1;
+  outline-offset: 3px;
+}
+
+@keyframes dotpulse {
+  0%, 80%, 100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}
+.dots span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #eceef1;
+  animation: dotpulse 1.2s infinite ease-in-out;
+}
+.dots span:nth-child(2) { animation-delay: 0.15s; }
+.dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .dots span { opacity: 0.7; }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+.reveal.is-shown {
+  opacity: 1;
+  transform: none;
+}
+
+.card-hover {
+  transition: transform 220ms ease, border-color 220ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: #3b4656;
+}
+
+.stripes-off .stripe {
+  opacity: 0;
+}
+.stripes-on .stripe {
+  animation: stripe-in 360ms ease-out both;
+}
+@keyframes stripe-in {
+  from { opacity: 0; transform: translateY(0.3px); }
+  to { opacity: 1; transform: none; }
+}
+
+.marker .marker-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.marker:hover .marker-halo {
+  animation: halo-pulse 1.4s ease-out infinite;
+}
+@keyframes halo-pulse {
+  0% { transform: scale(0.8); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.state-shape {
+  transition: filter 160ms ease, opacity 160ms ease;
+  cursor: pointer;
+  outline: none;
+}
+.state-shape:hover,
+.state-shape:focus-visible {
+  filter: brightness(1.18);
+}
+
+.rank-row {
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+.rank-row:hover {
+  background-color: #1b2028;
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+  .stripes-off .stripe { opacity: 1; }
+  .card-hover:hover, .rank-row:hover { transform: none; }
+}
+
+.try-chip {
+  display: inline-block;
+  transition: transform 180ms ease, color 180ms ease, text-decoration-color 180ms ease;
+}
+.try-chip:hover {
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .try-chip:hover { transform: none; }
+}
+
+.grow-bar {
+  transform-origin: left center;
+  animation: grow-bar 900ms cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes grow-bar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.region-col {
+  transition: background-color 180ms ease;
+}
+.region-col:hover {
+  background-color: #1b2028;
+}
+.anatomy-seq > :nth-child(2) { transition-delay: 90ms; }
+.anatomy-seq > :nth-child(3) { transition-delay: 180ms; }
+.anatomy-seq > :nth-child(4) { transition-delay: 270ms; }
+@media (prefers-reduced-motion: reduce) {
+  .grow-bar { animation: none; }
+}
+
+.method-step .method-copy,
+.method-step .method-visual {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+}
+.method-step .method-visual { transition-delay: 120ms; }
+.method-step.is-in .method-copy,
+.method-step.is-in .method-visual {
+  opacity: 1;
+  transform: none;
+}
+.rail-num { transition: opacity 400ms ease, transform 400ms ease; }
+.decomp-panel { position: relative; transition: transform 700ms cubic-bezier(.2,.7,.2,1), opacity 600ms ease; }
+.cell-zoom { transform: scale(0.55); opacity: 0.4; transition: transform 1100ms cubic-bezier(.2,.7,.2,1), opacity 700ms ease; }
+.cell-zoom.is-in { transform: none; opacity: 1; }
+.type-caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -0.15em; background: #eceef1; }
+.drop-wait .marker > * { opacity: 0; }
+.drop-in .marker > * { animation: marker-drop 700ms cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes marker-drop {
+  from { opacity: 0; transform: translateY(-26px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .method-step .method-copy, .method-step .method-visual { opacity: 1; transform: none; }
+  .decomp-panel { transform: none !important; opacity: 1 !important; }
+  .cell-zoom { transform: none; opacity: 1; }
+  .drop-wait .marker > * { opacity: 1; }
+  .drop-in .marker > * { animation: none; }
+  .rail-num { transition: none; }
+}
+
+.source-letter {
+  color: transparent;
+  -webkit-text-stroke: 1px #2b323c;
+  transition: -webkit-text-stroke-color 300ms ease, transform 600ms cubic-bezier(.2,.7,.2,1);
+}
+.group:hover .source-letter {
+  -webkit-text-stroke-color: #3b4656;
+  transform: translateY(-6px);
+}
+.map-veil {
+  position: absolute;
+  inset: 0 -40px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(22,26,33,0) 0, #161a21 120px, #161a21 100%);
+  transform: translateX(-120px);
+  transition: transform 1800ms cubic-bezier(.45,.05,.25,1);
+}
+.map-veil.is-lit { transform: translateX(105%); }
+.limit-cell { transition: background-color 220ms ease; }
+.limit-cell:hover { background-color: #1b2028; }
+@media (prefers-reduced-motion: reduce) {
+  .source-letter, .group:hover .source-letter { transform: none; transition: none; }
+  .map-veil { display: none; }
+}
+
+.st-fade { transition: opacity 220ms ease, filter 160ms ease; }
+.map-wait .st-fade { opacity: 0 !important; }
+.map-in .st-fade { animation: st-in 520ms ease-out backwards; }
+@keyframes st-in { from { opacity: 0; } to { opacity: 1; } }
+.region-label { transition: opacity 220ms ease; }
+.region-card { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease-out, transform 500ms ease-out, border-color 200ms ease; }
+.region-card.is-in { opacity: 1; transform: none; }
+.region-drawer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms ease; }
+.region-drawer > * { overflow: hidden; }
+.region-drawer.is-open { grid-template-rows: 1fr; }
+.rank-in { opacity: 0; transform: translateY(8px); transition: opacity 420ms ease-out, transform 420ms ease-out, background-color 160ms ease; }
+.ranking-in .rank-in { opacity: 1; transform: none; }
+.rank-bar { transform: scaleX(0); transform-origin: left center; transition: transform 800ms cubic-bezier(.2,.7,.2,1); }
+.ranking-in .rank-bar { transform: scaleX(1); }
+.rank-in.is-active, .rank-in:hover, .rank-in:focus-visible { background-color: #1b2028; }
+.rank-in.is-pinned { background-color: rgba(239, 90, 76, 0.07); }
+@media (prefers-reduced-motion: reduce) {
+  .map-wait .st-fade { opacity: 1 !important; }
+  .map-in .st-fade { animation: none; }
+  .region-card, .rank-in { opacity: 1; transform: none; transition: background-color 160ms ease; }
+  .rank-bar { transform: none; transition: none; }
+  .region-drawer { transition: none; }
+}
+.label-pop { animation: label-pop 420ms ease-out backwards; }
+@keyframes label-pop { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .label-pop { animation: none; } }
+
+/* Searched place highlight, shared by every Brazil and world map. */
+.marker .halo-once { animation: halo-pulse 1.2s ease-out 1; }
+.hl-dim { opacity: 0.55; filter: saturate(0.35); }
+.hl-anim { transition: opacity 400ms ease, filter 400ms ease, stroke-opacity 400ms ease, stroke-width 400ms ease; }
+.region-tag { transition: opacity 400ms ease, background-color 400ms ease, color 400ms ease, border-color 400ms ease; }
+@media (prefers-reduced-motion: reduce) {
+  .marker .halo-once { animation: none; }
+  .hl-anim, .region-tag { transition: none; }
+}
