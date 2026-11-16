@@ -186,7 +186,7 @@ export function Anatomy({
           <Chart option={clim} label={`Monthly climatology for ${BASELINE_LABEL}`} />
         </Figure>
         <Figure n={V.temperature ? 9 : 8} title="Residual" source={source} caption={V.temperature ? "What is left after removing the seasonal cycle and the trend. Red months ran warm, blue months cool." : `What is left after removing the seasonal cycle and the trend, in ${C}. Noisy residuals are why ${V.short.toLowerCase()} trends are often inconclusive.`}>
-          <Chart option={resid} label={`Bar chart of monthly residuals in ${U}`} />
+          <Chart option={resid} label={`Bar chart of monthly residuals in ${C}`} />
         </Figure>
         {!global && !V.temperature && (
           <Figure n={9} title="Second opinion: Mann-Kendall" source={source} caption="Mann-Kendall only asks whether later years tend to sit above earlier ones. It assumes no straight line and no bell curve, so a few extreme years cannot fake a trend. When it and the regression disagree, the verdict is Inconclusive.">
@@ -195,7 +195,7 @@ export function Anatomy({
                 ["S statistic", String(a.mk.s)],
                 ["Z (continuity and tie corrected)", fixed(a.mk.z)],
                 ["p value, two sided", pLabel(a.mk.p).replace("p ", "")],
-                [`Sen's slope, ${U} per decade`, signed(a.mk.senPerDecade, V.digits)],
+                [`Sen's slope, ${C} per decade`, signed(a.mk.senPerDecade, V.digits)],
               ].map(([k, val]) => (
                 <div key={k} className="border-t border-rule pt-3">
                   <dt className="text-[12.5px] text-muted">{k}</dt>

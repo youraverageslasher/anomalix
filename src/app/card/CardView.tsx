@@ -144,7 +144,7 @@ export function CardView() {
     body = (
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,540px)_1fr]">
         <div className="overflow-hidden rounded-card-sm border border-rule">
-          <canvas ref={ref} width={CARD_W} height={CARD_H} className="block h-auto w-full" role="img" aria-label={`Share card for ${p.name}: ${d ? `${d.verdict.confidence === "Inconclusive" ? "inconclusive" : directionWord(p.variable, d.verdict.direction).toLowerCase()}, ${d.analysis.trend.perDecade.toFixed(VARIABLES[p.variable].digits)} ${VARIABLES[p.variable].unit} per decade` : ""}`} />
+          <canvas ref={ref} width={CARD_W} height={CARD_H} className="block h-auto w-full" role="img" aria-label={`Share card for ${p.name}: ${d ? `${d.verdict.confidence === "Inconclusive" ? "inconclusive" : directionWord(p.variable, d.verdict.direction).toLowerCase()}, ${d.analysis.trend.perDecade.toFixed(VARIABLES[p.variable].digits)} ${VARIABLES[p.variable].change} per decade` : ""}`} />
         </div>
         <div className="flex flex-col justify-center gap-5">
           <p className="label">Share card · 1080 × 1350</p>
