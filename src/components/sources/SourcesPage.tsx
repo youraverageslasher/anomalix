@@ -26,7 +26,10 @@ const KM_PER_DEG = 111.32;
 
 const limits = (s: Span | null, lat: number) => [
   { title: "It is not a station.", body: `The cell covers a region about ${cellText(lat, " by ")} at this latitude, not the thermometer downtown.` },
-  { title: "It is not a forecast.", body: `It describes what already happened${s ? `, ${s.from} to ${s.to}` : ""}. It says nothing about next year.` },
+  {
+    title: "It is not a forecast.",
+    body: `The report is not a forecast: it describes what already happened over decades${s ? `, ${s.from} to ${s.to}` : ""}. Only the 'This week vs 45 years of climate' widget looks ahead, using Open-Meteo, and it is labeled as weather, not climate.`,
+  },
   { title: "It does not assign a cause.", body: "It measures how much and how surely a variable moved. Why it moved is a different question." },
   { title: "It can be inconclusive.", body: "When the test cannot separate signal from chance, the verdict says so. Not significant does not mean no trend." },
 ];
@@ -42,9 +45,11 @@ const references = (accessed: string): { group: string; items: string[] }[] => [
     group: "Data endpoints",
     items: [
       `NASA Langley Research Center, POWER Project. POWER monthly point API, parameters T2M, PRECTOTCORR, RH2M and WS2M, community RE. https://power.larc.nasa.gov/api/temporal/monthly/point (accessed ${accessed})`,
+      `NASA Langley Research Center, POWER Project. POWER daily point API, parameters T2M_MAX, T2M_MIN and PRECTOTCORR, for the climate context in the 'This week vs 45 years of climate' widget only. https://power.larc.nasa.gov/api/temporal/daily/point (accessed ${accessed})`,
       `GISTEMP Team, GISS Surface Temperature Analysis (GISTEMP v4), NASA Goddard Institute for Space Studies. Global monthly and annual means. https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv (accessed ${accessed})`,
       `GISTEMP Team, GISTEMP v4 zonal annual means, used for the latitude band comparison. https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts+dSST.csv (accessed ${accessed})`,
       `Open-Meteo geocoding API, location data based on GeoNames. https://geocoding-api.open-meteo.com/v1/search (accessed ${accessed})`,
+      `Open-Meteo forecast API, 7-day weather forecast for the 'This week vs 45 years of climate' widget only. https://api.open-meteo.com/v1/forecast (accessed ${accessed})`,
       "NASA GMAO, MERRA-2 reanalysis, the meteorological basis of POWER. https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/",
       `NASA Earth Science Data Systems, NASA Worldview with GIBS imagery: ${TRUE_COLOR} and ${COASTLINES}. Linked from each report for visual inspection; no imagery or data is fetched by the app. https://worldview.earthdata.nasa.gov/ (accessed ${accessed})`,
     ],
