@@ -29,6 +29,7 @@ import { fixed, pShort, signed, reportCode, todayLabel } from "@/lib/data/fmt";
 import { VARIABLES } from "@/lib/data/variables";
 import { Chart, AXIS_TEXT, GRID_LINE, TOOLTIP } from "./Chart";
 import { gistempName } from "@/lib/data/origin";
+import { WeekWidget } from "./WeekWidget";
 
 function Skeleton() {
   return (
@@ -142,6 +143,7 @@ export function ReportPage() {
       {d && (
         <>
           <Hero variable={p.variable} shadeBrazil={scope.shadeBrazilOnGlobe} search={search} name={p.name || "This place"} lat={p.lat} lon={p.lon} global={p.global} from={F} to={T} d={d} planet={planet.status === "ready" ? planet.data : null} />
+          {!p.global && <WeekWidget lat={p.lat} lon={p.lon} />}
 
           <section aria-label="Key numbers" className="mx-auto mt-12 max-w-canvas px-5 md:px-side">
             <StatRow
