@@ -8,6 +8,7 @@ import { fetchGistemp } from "./gistemp";
 import type { DataResult, Place } from "./types";
 import { coverage, spanOf, type Coverage } from "./range";
 import { partialMonthsFor } from "./monthlyCsv";
+import { compareSlopes, isLinked, pearson, sameCell, type SlopeComparison } from "./pairCompare";
 
 export interface CityReport {
   variable: VariableCode;
@@ -50,13 +51,23 @@ export interface GlobalReport {
   origin?: DataOrigin;
 }
 
-export async function cityReport(place: Place, opts: AnalyzeOptions = {}, variable: VariableCode = DEFAULT_VARIABLE, withDayNight = false): Promise<DataResult<CityReport>> {
+/*
+ * The single place analysis behind /report and /compare. onlyYears restricts the analysis to those years
+ * (the compare view passes the years both places share); everything else is the same code path.
+ */
+export async function buildPlaceReport(
+  place: Place,
+  opts: AnalyzeOptions = {},
+  variable: VariableCode = DEFAULT_VARIABLE,
+  withDayNight = false,
+  onlyYears?: ReadonlySet<number>,
+): Promise<DataResult<CityReport>> {
   const [power, dayNight] = await Promise.all([
     fetchPower(place.lat, place.lon, variable),
     withDayNight && variable === "T2M" ? dayNightFor(place.lat, place.lon, opts) : Promise.resolve(undefined),
   ]);
   if (!power.ok) return power;
-  const months = completeYears(power.data.months);
+  const months = completeYears(power.data.months).filter((m) => !onlyYears || onlyYears.has(m.year));
   const analysis = analyze(months, opts);
   if (!analysis.ok) return analysis;
   const lastComplete = months.reduce((y, m) => Math.max(y, m.year), -Infinity);
@@ -95,6 +106,47 @@ export async function globalReport(opts: AnalyzeOptions = {}): Promise<DataResul
       months: g.data.months.filter((m) => m.year >= analysis.startYear && m.year <= analysis.endYear),
     },
   };
+}
+
+export function cityReport(place: Place, opts: AnalyzeOptions = {}, variable: VariableCode = DEFAULT_VARIABLE, withDayNight = false): Promise<DataResult<CityReport>> {
+  return buildPlaceReport(place, opts, variable, withDayNight);
+}
+
+export interface PlacePairReport {
+  a: CityReport;
+  b: CityReport;
+  years: number[];
+  comparison: SlopeComparison;
+  r: number;
+  linked: boolean;
+}
+
+export type PairResult = { ok: true; data: PlacePairReport } | { ok: false; error: string; code: "same-cell" | "too-short" | "data" };
+
+/* Two places, same variable, period and season, analyzed on the years both have. */
+export async function comparePlaces(a: Place, b: Place, opts: AnalyzeOptions = {}, variable: VariableCode = DEFAULT_VARIABLE): Promise<PairResult> {
+  if (sameCell(a, b)) return { ok: false, code: "same-cell", error: "Both places fall in the same NASA POWER grid cell, so they share one data series. Pick a place farther away." };
+  const [ra, rb] = await Promise.all([buildPlaceReport(a, opts, variable), buildPlaceReport(b, opts, variable)]);
+  if (!ra.ok) return { ok: false, code: "data", error: `${a.name}: ${ra.error}` };
+  if (!rb.ok) return { ok: false, code: "data", error: `${b.name}: ${rb.error}` };
+  const yb = new Set(rb.data.analysis.annual.map((x) => x.year));
+  const years = ra.data.analysis.annual.map((x) => x.year).filter((y) => yb.has(y));
+  if (years.length < 10) return { ok: false, code: "too-short", error: "The two places share fewer than 10 complete years." };
+  const common = new Set(years);
+  const span = { ...opts, startYear: years[0], endYear: years[years.length - 1] };
+  const [ca, cb] = await Promise.all([buildPlaceReport(a, span, variable, false, common), buildPlaceReport(b, span, variable, false, common)]);
+  if (!ca.ok) return { ok: false, code: "data", error: `${a.name}: ${ca.error}` };
+  if (!cb.ok) return { ok: false, code: "data", error: `${b.name}: ${cb.error}` };
+  const ta = ca.data.analysis.trend;
+  const tb = cb.data.analysis.trend;
+  const comparison = compareSlopes({ perDecade: ta.perDecade, sePerDecade: ta.se * 10 }, { perDecade: tb.perDecade, sePerDecade: tb.se * 10 });
+  const byYear = new Map(cb.data.analysis.anomalies.map((x) => [x.year, x.value]));
+  const pairs = ca.data.analysis.anomalies.filter((x) => byYear.has(x.year));
+  const r = pearson(
+    pairs.map((x) => x.value),
+    pairs.map((x) => byYear.get(x.year) as number),
+  );
+  return { ok: true, data: { a: ca.data, b: cb.data, years, comparison, r, linked: isLinked(r) } };
 }
 
 export async function compareCities(places: Place[], opts: AnalyzeOptions = {}, variable: VariableCode = DEFAULT_VARIABLE) {

@@ -10,6 +10,7 @@ import { GISTEMP_URL } from "@/lib/data/gistemp";
 import { partialNote, periodText, spanOf } from "@/lib/data/range";
 import { gistempName } from "@/lib/data/origin";
 import { monthlyCsv, monthlyFilename, monthlyTidy } from "@/lib/data/monthlyCsv";
+import { placeParam } from "@/lib/data/pairCompare";
 
 const UNIT_SLUG: Record<VariableCode, string> = { T2M: "c", PRECTOTCORR: "mm_per_day", RH2M: "percent", WS2M: "m_per_s" };
 
@@ -188,6 +189,14 @@ export function Reproduce({ variable = "T2M", d, name, global, lat, lon, from, t
           >
             Export evidence
           </button>
+          {!global && (
+            <a
+              href={`/compare?${new URLSearchParams({ a: placeParam({ lat, lon, name }), variable, from: String(from), to: String(to), season }).toString()}`}
+              className="inline-flex h-[44px] items-center rounded-full border border-highlight-border px-5 text-[14px] font-medium text-text transition-colors hover:bg-highlight"
+            >
+              Compare with another place
+            </a>
+          )}
           <button onClick={copy} className="inline-flex h-[44px] items-center rounded-full bg-text px-5 text-[14px] font-semibold text-bg transition-colors hover:bg-white">
             {copied ? "Copied" : "Copy Python snippet"}
           </button>

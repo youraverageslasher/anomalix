@@ -35,7 +35,7 @@ export async function geocode(q: string, signal?: AbortSignal, count = 5): Promi
   return results.map((r) => ({ nome: labelFor(r), lat: r.latitude, lon: r.longitude, cc: r.country_code, admin1: r.admin1 }));
 }
 
-export function SearchPill({ placeholder = "City name or coordinates" }: { placeholder?: string }) {
+export function SearchPill({ placeholder = "City name or coordinates", onPick }: { placeholder?: string; onPick?: (p: Place) => void }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [items, setItems] = useState<Place[]>([]);
@@ -70,6 +70,10 @@ export function SearchPill({ placeholder = "City name or coordinates" }: { place
 
   function go(p: Place) {
     setOpen(false);
+    if (onPick) {
+      setQ("");
+      return onPick(p);
+    }
     setBusy(true);
     router.push(reportHref(p));
   }
