@@ -18,6 +18,8 @@ export interface CityReport {
   verdict: Verdict;
   /* What NASA POWER returned for this cell, partial years included. */
   coverage: Coverage | null;
+  /* Valid months of an incomplete year after the last complete one (for the monthly export only; never in the analysis). */
+  partialMonths?: { year: number; month: number; value: number }[];
   /* Temperature reports only: daily maximum and minimum, each with its own year range. */
   dayNight?: { ok: true; max: ExtremeFit; min: ExtremeFit } | { ok: false; error: string };
 }
@@ -56,6 +58,7 @@ export async function cityReport(place: Place, opts: AnalyzeOptions = {}, variab
   const months = completeYears(power.data.months);
   const analysis = analyze(months, opts);
   if (!analysis.ok) return analysis;
+  const lastComplete = months.reduce((y, m) => Math.max(y, m.year), -Infinity);
   return {
     ok: true,
     data: {
@@ -68,6 +71,7 @@ export async function cityReport(place: Place, opts: AnalyzeOptions = {}, variab
       coverage: coverage(power.data.months),
       ...(dayNight ? { dayNight } : {}),
       months: months.filter((m) => m.year >= analysis.startYear && m.year <= analysis.endYear),
+      partialMonths: power.data.months.filter((m) => m.year > lastComplete && analysis.endYear === lastComplete),
     },
   };
 }

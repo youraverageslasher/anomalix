@@ -9,6 +9,7 @@ import { EXTREMES, POWER_END, POWER_ENDPOINT, POWER_START, powerUrl } from "@/li
 import { GISTEMP_URL } from "@/lib/data/gistemp";
 import { partialNote, periodText, spanOf } from "@/lib/data/range";
 import { gistempName } from "@/lib/data/origin";
+import { monthlyCsv, monthlyFilename, monthlyTidy } from "@/lib/data/monthlyCsv";
 
 const UNIT_SLUG: Record<VariableCode, string> = { T2M: "c", PRECTOTCORR: "mm_per_day", RH2M: "percent", WS2M: "m_per_s" };
 
@@ -137,6 +138,11 @@ export function Reproduce({ variable = "T2M", d, name, global, lat, lon, from, t
     setTimeout(() => save(json, "application/json", `${base}.json`), 400);
   }
 
+  function downloadMonthly() {
+    const rows = monthlyTidy(d.months ?? [], d.partialMonths ?? []);
+    save(monthlyCsv(rows, { place: name, lat, lon, parameter: variable }), "text/csv", monthlyFilename(variable, lat, lon));
+  }
+
   async function copy() {
     try {
       await navigator.clipboard.writeText(code);
@@ -156,11 +162,25 @@ export function Reproduce({ variable = "T2M", d, name, global, lat, lon, from, t
             Download the {d.analysis.annual.length} yearly values behind this report, or copy a short Python script that pulls the same NASA data and
             should print {signed(d.analysis.trend.perDecade, V.digits)} {V.unit} per decade, plus the Mann-Kendall check.
           </p>
+          {!global && (
+            <p id="monthly-help" className="mt-2 text-[12px] text-muted">
+              Monthly CSV: one row per valid month. Anomaly is deseasonalized: the value minus that calendar month&apos;s mean over the exported months.
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-3">
           <button onClick={download} className="inline-flex h-[44px] items-center rounded-full border border-highlight-border px-5 text-[14px] font-medium text-text transition-colors hover:bg-highlight">
             Download CSV
           </button>
+          {!global && (
+            <button
+              onClick={downloadMonthly}
+              aria-describedby="monthly-help"
+              className="inline-flex h-[44px] items-center rounded-full border border-highlight-border px-5 text-[14px] font-medium text-text transition-colors hover:bg-highlight"
+            >
+              Monthly CSV (tidy)
+            </button>
+          )}
           <button
             onClick={exportEvidence}
             aria-label={`Export evidence for ${global ? "the global series" : name}: a CSV of yearly values and a JSON of every statistic and source`}

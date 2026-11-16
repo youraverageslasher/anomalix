@@ -18,6 +18,7 @@ export interface MainData {
   cell?: { lat: number; lon: number };
   elevation?: number | null;
   months?: { year: number; month: number; value: number }[];
+  partialMonths?: { year: number; month: number; value: number }[];
   coverage?: Coverage | null;
   dayNight?: { ok: true; max: ExtremeFit; min: ExtremeFit } | { ok: false; error: string };
   /* GISTEMP only: live file or bundled snapshot. */
