@@ -4,7 +4,7 @@ import { fixed, pShort, signed } from "@/lib/data/fmt";
 import { dayNightPattern, PATTERN_LINE, type ExtremeFit } from "@/lib/data/daynight";
 import { dash } from "@/lib/data/range";
 import { VARIABLES, type VariableCode } from "@/lib/data/variables";
-import { ACCEL_YEARS } from "@/lib/data/rigor";
+import { ACCEL_YEARS, PACE_LABELS } from "@/lib/data/rigor";
 import type { MainData } from "./useReportData";
 import { gistempName } from "@/lib/data/origin";
 
@@ -35,8 +35,8 @@ export function RigorRow({ d, variable }: { d: MainData; variable: VariableCode 
       "Pace",
       acc ? (
         <>
-          <span className="text-text">{acc.pace === "accelerating" ? "Accelerating" : acc.pace === "slowing" ? "Slowing" : "Steady"}</span>: last {acc.years} years ({acc.from}-{acc.to}){" "}
-          {signed(acc.recent.perDecade, V.digits)} ± {fixed(acc.recent.halfWidth, V.digits)} against {signed(acc.full, V.digits)} {du} for the full series
+          <span className="text-text">{PACE_LABELS[acc.pace].en.charAt(0).toUpperCase() + PACE_LABELS[acc.pace].en.slice(1)}</span>: last {acc.years} years ({acc.from}-{acc.to}){" "}
+          {signed(acc.recent.perDecade, V.digits)} ± {fixed(acc.recent.halfWidth, V.digits)} against {signed(acc.full, V.digits)} ± {fixed(acc.fullSe, V.digits)} (standard error) {du} for the full series
         </>
       ) : (
         <>The series is too short to compare its last {ACCEL_YEARS} years with the whole.</>

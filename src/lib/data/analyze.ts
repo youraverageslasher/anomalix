@@ -176,7 +176,7 @@ export function analyze(months: MonthValue[], opts: AnalyzeOptions = {}): Analys
     trend,
     totalChange: trend.slopePerYear * (xs[xs.length - 1] - xs[0]),
     mk,
-    acceleration: acceleration(annual, trend.perDecade),
+    acceleration: acceleration(annual, trend.perDecade, trend.se * 10),
     climatology: clim,
     residual,
     monthsUsed: inPeriod.length,

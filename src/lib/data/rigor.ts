@@ -70,7 +70,30 @@ function fitPerDecade(xs: number[], ys: number[]): SimpleFit {
   return { perDecade: b * 10, halfWidth: tQuantile(0.975, n - 2) * se * 10 };
 }
 
-export type Pace = "accelerating" | "slowing" | "steady";
+export type Pace = "accelerating" | "slowing" | "steady" | "reversing";
+
+/* UI strings for each pace, English and Portuguese. */
+export const PACE_LABELS: Record<Pace, { en: string; pt: string }> = {
+  accelerating: { en: "accelerating", pt: "acelerando" },
+  slowing: { en: "slowing", pt: "desacelerando" },
+  steady: { en: "steady", pt: "estável" },
+  reversing: { en: "reversing", pt: "revertendo" },
+};
+
+/*
+ * Pace from the recent slope r, the full slope f and the standard error se of the full slope (same units, per decade).
+ * Magnitudes are compared, so a decline that gets faster is accelerating and a rise that gets weaker is slowing.
+ *   opposite signs            -> reversing
+ *   same sign, |r| > |f| + se -> accelerating
+ *   same sign, |r| < |f| - se -> slowing
+ *   otherwise                 -> steady
+ */
+export function classifyPace(r: number, f: number, se: number): Pace {
+  if (Math.sign(r) * Math.sign(f) < 0) return "reversing";
+  if (Math.abs(r) > Math.abs(f) + se) return "accelerating";
+  if (Math.abs(r) < Math.abs(f) - se) return "slowing";
+  return "steady";
+}
 
 export interface Acceleration {
   pace: Pace;
@@ -79,23 +102,22 @@ export interface Acceleration {
   to: number;
   recent: SimpleFit;
   full: number;
+  fullSe: number;
 }
 
 /*
- * Slope of the last 15 points against the full series. "accelerating" only when the recent slope exceeds the full
- * slope by more than the recent interval half width; "slowing" in the mirror case; otherwise "steady".
- * Needs more points than the window, or it returns null.
+ * Slope of the last 15 points against the full series, classified by classifyPace with the standard error of the full
+ * slope (per decade). Needs more points than the window, or it returns null.
  */
-export function acceleration(series: { year: number; value: number }[], fullPerDecade: number, years = ACCEL_YEARS): Acceleration | null {
+export function acceleration(series: { year: number; value: number }[], fullPerDecade: number, fullSePerDecade: number, years = ACCEL_YEARS): Acceleration | null {
   if (series.length <= years) return null;
   const tail = series.slice(-years);
   const recent = fitPerDecade(
     tail.map((p) => p.year),
     tail.map((p) => p.value),
   );
-  const diff = recent.perDecade - fullPerDecade;
-  const pace: Pace = diff > recent.halfWidth ? "accelerating" : -diff > recent.halfWidth ? "slowing" : "steady";
-  return { pace, years, from: tail[0].year, to: tail[tail.length - 1].year, recent, full: fullPerDecade };
+  const pace = classifyPace(recent.perDecade, fullPerDecade, fullSePerDecade);
+  return { pace, years, from: tail[0].year, to: tail[tail.length - 1].year, recent, full: fullPerDecade, fullSe: fullSePerDecade };
 }
 
 /* Theil-Sen agrees with OLS when it has the same sign and sits inside the OLS 95% interval. */

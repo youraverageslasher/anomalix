@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { acceleration, ar1Adjust, lag1, residualSd, theilSenAgrees } from "@/lib/data/rigor";
+import { acceleration, ar1Adjust, lag1, residualSd, theilSenAgrees, classifyPace, PACE_LABELS } from "@/lib/data/rigor";
 import { olsT } from "@/lib/data/analyze";
 import { senSlope } from "@/lib/stats";
 
@@ -56,19 +56,44 @@ describe("residual SD", () => {
 
 describe("acceleration", () => {
   const series = (f: (i: number) => number, n = 40) => Array.from({ length: n }, (_, i) => ({ year: 1990 + i, value: f(i) + (i % 2 ? 0.01 : -0.01) }));
+  const pace = (s: { year: number; value: number }[]) => {
+    const t = olsT(s.map((p) => p.year), s.map((p) => p.value));
+    return acceleration(s, t.perDecade, t.se * 10)?.pace;
+  };
   it("steady for a straight line", () => {
-    const s = series((i) => 0.03 * i);
-    expect(acceleration(s, olsT(s.map((p) => p.year), s.map((p) => p.value)).perDecade)?.pace).toBe("steady");
+    expect(pace(series((i) => 0.03 * i))).toBe("steady");
   });
-  it("accelerating when the last years climb much faster", () => {
-    const s = series((i) => (i < 25 ? 0.01 * i : 0.25 + 0.1 * (i - 25)));
-    expect(acceleration(s, olsT(s.map((p) => p.year), s.map((p) => p.value)).perDecade)?.pace).toBe("accelerating");
+  it("accelerating when a rise gets much faster", () => {
+    expect(pace(series((i) => (i < 25 ? 0.01 * i : 0.25 + 0.1 * (i - 25))))).toBe("accelerating");
   });
-  it("slowing in the mirror case", () => {
-    const s = series((i) => (i < 25 ? 0.1 * i : 2.5 + 0.0 * (i - 25)));
-    expect(acceleration(s, olsT(s.map((p) => p.year), s.map((p) => p.value)).perDecade)?.pace).toBe("slowing");
+  it("accelerating when a decline gets much faster", () => {
+    expect(pace(series((i) => (i < 25 ? -0.01 * i : -0.25 - 0.1 * (i - 25))))).toBe("accelerating");
+  });
+  it("slowing when a rise gets much weaker but keeps rising", () => {
+    expect(pace(series((i) => (i < 25 ? 0.1 * i : 2.5 + 0.01 * (i - 25))))).toBe("slowing");
+  });
+  it("reversing when the recent slope has the opposite sign", () => {
+    expect(pace(series((i) => (i < 25 ? 0.1 * i : 2.5 - 0.05 * (i - 25))))).toBe("reversing");
   });
   it("needs more points than the window", () => {
-    expect(acceleration(series((i) => i, 15), 1)).toBeNull();
+    expect(acceleration(series((i) => i, 15), 1, 0.1)).toBeNull();
+  });
+});
+
+describe("classifyPace", () => {
+  it("the four rules, by magnitude", () => {
+    expect(classifyPace(0.9, 0.3, 0.1)).toBe("accelerating");
+    expect(classifyPace(-0.9, -0.3, 0.1)).toBe("accelerating");
+    expect(classifyPace(0.1, 0.5, 0.1)).toBe("slowing");
+    expect(classifyPace(-0.1, -0.5, 0.1)).toBe("slowing");
+    expect(classifyPace(-0.2, 0.5, 0.1)).toBe("reversing");
+    expect(classifyPace(0.55, 0.5, 0.1)).toBe("steady");
+  });
+  it("São José do Rio Preto RH2M: a decline three times faster is accelerating, not slowing", () => {
+    expect(classifyPace(-9.606, -2.868272, 1.007624)).toBe("accelerating");
+  });
+  it("has English and Portuguese strings for every pace", () => {
+    expect(PACE_LABELS.reversing).toEqual({ en: "reversing", pt: "revertendo" });
+    for (const k of ["accelerating", "slowing", "steady", "reversing"] as const) expect(PACE_LABELS[k].en && PACE_LABELS[k].pt).toBeTruthy();
   });
 });
