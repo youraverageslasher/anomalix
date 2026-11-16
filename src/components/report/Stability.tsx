@@ -13,6 +13,7 @@ import { rollingWindows, windowStory, MIN_SERIES_YEARS, WINDOW_YEARS } from "@/l
 import { VARIABLES, type VariableCode } from "@/lib/data/variables";
 import type { MainData } from "./useReportData";
 import { hottestMonth, IMAGE_DAY, PAD_DEG, validCoords, worldviewUrl } from "@/lib/data/worldview";
+import { gistempName, utcDate } from "@/lib/data/origin";
 
 /* Rolling 25 year windows of the active variable. Hidden when the series has fewer than 35 years. */
 export function WindowStability({ d, variable, global = false }: { d: MainData; variable: VariableCode; global?: boolean }) {
@@ -81,7 +82,7 @@ export function WindowStability({ d, variable, global = false }: { d: MainData; 
         <p className="mt-2 text-[12px] leading-relaxed text-muted">
           Windows overlap, so they are not independent tests. Each window uses the same rule as the headline: OLS, Mann-Kendall, Theil-Sen and the p adjusted for autocorrelation must agree. Shown only for series of at least {MIN_SERIES_YEARS} years.
         </p>
-        <p className="mt-2 text-[12px] text-muted">{global ? "NASA GISS GISTEMP v4, global monthly means." : `NASA POWER ${V.code}, MERRA-2 based, monthly.`}</p>
+        <p className="mt-2 text-[12px] text-muted">{global ? `${gistempName(d.origin)}, global monthly means.` : `NASA POWER ${V.code}, MERRA-2 based, monthly.`}</p>
       </figure>
     </section>
   );
@@ -164,7 +165,7 @@ export function ZonalComparison({ d, lat, name, variable, global, sigla }: { d: 
         </p>
         <p className="mt-2 break-words text-[12px] text-muted">
           Sources: NASA POWER monthly point API; {ZONAL_URL}
-          {accessed ? ` (accessed ${accessed})` : ""}.
+          {z.data.origin?.kind === "snapshot" ? ` (bundled snapshot fetched ${utcDate(z.data.origin.fetchedAt)}, live file unreachable)` : accessed ? ` (accessed ${accessed})` : ""}.
         </p>
       </figure>
     </section>
@@ -233,7 +234,7 @@ export function PatternScaling({ d, planet, variable, global, name }: { d: MainD
             <p className="mt-3 text-[12px] leading-relaxed text-muted">
               Both series trend upward in time, so a high R squared mostly reflects the shared trend. The year to year link correlates the two series after each is detrended with its own line; an r near zero means they share the long-term trend but not the yearly ups and downs. Anomalies are against each series&apos; own mean over {ref}. A pattern, not a cause.
             </p>
-            <p className="mt-2 text-[12px] text-muted">NASA POWER T2M, MERRA-2 based, and NASA GISS GISTEMP v4 global means.</p>
+            <p className="mt-2 text-[12px] text-muted">NASA POWER T2M, MERRA-2 based, and {gistempName(planet.origin)} global means.</p>
           </div>
         </div>
       </figure>

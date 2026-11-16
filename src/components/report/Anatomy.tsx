@@ -8,6 +8,7 @@ import type { MainData } from "./useReportData";
 import { TwoSourcesFigure } from "./TwoSources";
 import type { Season } from "@/lib/data/types";
 import { VARIABLES, NEUTRAL_SERIES, type VariableCode } from "@/lib/data/variables";
+import { gistempName } from "@/lib/data/origin";
 
 const MONTHS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -176,10 +177,11 @@ export function Anatomy({
             season={season}
             local={global ? null : a.annual}
             planet={global ? a.annual : planet?.analysis.annual ?? null}
+            origin={global ? d.origin : planet?.origin}
             error={global ? undefined : planetError}
           />
         )}
-        <Figure n={V.temperature ? 8 : 7} title="Seasonality" source={`${global ? "NASA GISS GISTEMP v4" : "NASA POWER (MERRA-2)"}, ${BASELINE_LABEL}.`} caption={V.temperature ? "The 1981-2010 seasonal cycle, removed before measuring the trend. Skip that step and an ordinary summer would pass for warming." : `The 1981-2010 seasonal cycle of ${V.name.toLowerCase()}, removed before measuring the trend, so an ordinary wet or windy season is never read as a trend.`}>
+        <Figure n={V.temperature ? 8 : 7} title="Seasonality" source={`${global ? gistempName(d.origin) : "NASA POWER (MERRA-2)"}, ${BASELINE_LABEL}.`} caption={V.temperature ? "The 1981-2010 seasonal cycle, removed before measuring the trend. Skip that step and an ordinary summer would pass for warming." : `The 1981-2010 seasonal cycle of ${V.name.toLowerCase()}, removed before measuring the trend, so an ordinary wet or windy season is never read as a trend.`}>
           <Chart option={clim} label={`Monthly climatology for ${BASELINE_LABEL}`} />
         </Figure>
         <Figure n={V.temperature ? 9 : 8} title="Residual" source={source} caption={V.temperature ? "What is left after removing the seasonal cycle and the trend. Red months ran warm, blue months cool." : `What is left after removing the seasonal cycle and the trend, in ${U}. Noisy residuals are why ${V.short.toLowerCase()} trends are often inconclusive.`}>

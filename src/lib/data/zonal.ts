@@ -1,4 +1,7 @@
 import type { DataResult } from "./types";
+import { fetchUpstreamText } from "./upstream";
+import { GISTEMP_SNAPSHOT } from "./gistempSnapshot";
+import type { DataOrigin } from "./origin";
 
 export const ZONAL_URL = "https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts+dSST.csv";
 const REVALIDATE = 86400;
@@ -22,6 +25,8 @@ export interface ZonalSeries {
   global: { year: number; value: number }[];
   firstYear: number;
   lastYear: number;
+  /* Live file or bundled snapshot; never changes a number, only the source line. */
+  origin?: DataOrigin;
 }
 
 /* Header on line 1; *** marks a missing value; a year with any missing band is skipped. */
@@ -59,23 +64,33 @@ export function bandFor(lat: number): BandId | null {
   return b ? b.id : null;
 }
 
-let cached: Promise<DataResult<ZonalSeries>> | null = null;
+const SNAPSHOT_RETRY_MS = 10 * 60 * 1000;
+
+/* The bundled copy, parsed by the same function as the live file. */
+export function zonalFromSnapshot(reason: string): DataResult<ZonalSeries> {
+  const z = parseZonal(GISTEMP_SNAPSHOT.zonal.csv);
+  if (!z) return { ok: false, error: `NASA GISTEMP zonal file ${reason}, and the bundled snapshot could not be parsed` };
+  return { ok: true, data: { ...z, origin: { kind: "snapshot", fetchedAt: GISTEMP_SNAPSHOT.fetchedAt, lastModified: GISTEMP_SNAPSHOT.lastModified, reason } } };
+}
+
+/* Live first; on any failure the bundled snapshot. */
+export async function loadZonal(fetchText: typeof fetchUpstreamText = fetchUpstreamText): Promise<DataResult<ZonalSeries>> {
+  const r = await fetchText(ZONAL_URL, "gistemp-zonal", REVALIDATE);
+  if (!r.ok) return zonalFromSnapshot(r.reason);
+  const z = parseZonal(r.text);
+  if (!z) return zonalFromSnapshot("could not be parsed");
+  return { ok: true, data: { ...z, origin: { kind: "live" } } };
+}
+
+let cached: { at: number; p: Promise<DataResult<ZonalSeries>> } | null = null;
 
 export function fetchZonal(): Promise<DataResult<ZonalSeries>> {
-  if (cached) return cached;
-  cached = (async (): Promise<DataResult<ZonalSeries>> => {
-    try {
-      const res = await fetch(ZONAL_URL, { next: { revalidate: REVALIDATE }, signal: AbortSignal.timeout(20000) });
-      if (!res.ok) return { ok: false, error: `NASA GISTEMP zonal file answered ${res.status}` };
-      const z = parseZonal(await res.text());
-      if (!z) return { ok: false, error: "NASA GISTEMP zonal file could not be parsed" };
-      return { ok: true, data: z };
-    } catch {
-      return { ok: false, error: "NASA GISTEMP zonal file did not respond" };
-    }
-  })();
-  cached.then((r) => {
+  if (cached) return cached.p;
+  const entry = { at: Date.now(), p: loadZonal() };
+  cached = entry;
+  entry.p.then((r) => {
     if (!r.ok) cached = null;
+    else if (r.data.origin?.kind === "snapshot") setTimeout(() => cached === entry && (cached = null), SNAPSHOT_RETRY_MS).unref?.();
   });
-  return cached;
+  return entry.p;
 }

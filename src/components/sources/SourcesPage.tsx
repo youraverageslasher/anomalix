@@ -17,6 +17,7 @@ import { SourceSheet, VarChip } from "./SourceSheet";
 import { DEFAULT_VARIABLE, VARIABLES, VARIABLE_CODES } from "@/lib/data/variables";
 import { CoverageMap } from "./CoverageMap";
 import { TwoSourcesFigure } from "@/components/report/TwoSources";
+import { utcDate } from "@/lib/data/origin";
 
 const STATE_VALUES = Object.fromEntries(grid.states.map((s) => [s.sigla, s.value]));
 const DEFAULT = { name: "São José do Rio Preto, SP", lat: -20.81, lon: -49.38 };
@@ -150,7 +151,7 @@ export function SourcesPage() {
           </p>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6">
             <Ledger value={d?.months?.length ?? null} label="monthly values" sub={`behind ${short}, NASA POWER`} />
-            <Ledger value={r?.months?.length ?? null} label="months of global record" sub={r ? `GISTEMP, ${sb?.from} to ${sb?.to}` : "GISTEMP"} />
+            <Ledger value={r?.months?.length ?? null} label="months of global record" sub={r ? `GISTEMP, ${sb?.from} to ${sb?.to}${r.origin?.kind === "snapshot" ? `, bundled snapshot fetched ${utcDate(r.origin.fetchedAt)}` : ""}` : "GISTEMP"} />
             <Ledger value={grid.points.length} label="grid points" sub={`across Brazil, ${grid.period}`} />
           </div>
         </div>
@@ -252,6 +253,7 @@ export function SourcesPage() {
           season="ALL"
           local={d ? d.analysis.annual : null}
           planet={g ? g.analysis.annual : null}
+          origin={g?.origin}
           error={planet.status === "error" ? planet.error : main.status === "error" ? main.error : undefined}
         />
       </section>

@@ -6,6 +6,7 @@ import { dash } from "@/lib/data/range";
 import { VARIABLES, type VariableCode } from "@/lib/data/variables";
 import { ACCEL_YEARS } from "@/lib/data/rigor";
 import type { MainData } from "./useReportData";
+import { gistempName } from "@/lib/data/origin";
 
 const pText = (p: number) => (pShort(p).startsWith("<") ? `p ${pShort(p)}` : `p = ${pShort(p)}`);
 
@@ -97,7 +98,7 @@ export function SignalNoise({ d, variable, from, to, global = false }: { d: Main
       </div>
       <p className="mt-5 text-[14.5px] leading-relaxed text-body">{sentence}</p>
       <p className="mt-auto pt-4 text-[12px] text-muted">Signal: absolute trend times the years of the series. Noise: standard deviation of the yearly values around the line.</p>
-      <p className="mt-2 text-[12px] text-muted">{global ? "NASA GISS GISTEMP v4, global monthly means." : `NASA POWER ${V.code}, MERRA-2 based, monthly.`}</p>
+      <p className="mt-2 text-[12px] text-muted">{global ? `${gistempName(d.origin)}, global monthly means.` : `NASA POWER ${V.code}, MERRA-2 based, monthly.`}</p>
     </figure>
   );
 }

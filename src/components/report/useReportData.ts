@@ -9,6 +9,7 @@ import type { VariableCode } from "@/lib/data/variables";
 import type { Coverage } from "@/lib/data/range";
 import type { ExtremeFit } from "@/lib/data/daynight";
 import { POWER_START } from "@/lib/data/power";
+import type { DataOrigin } from "@/lib/data/origin";
 
 export interface MainData {
   variable?: VariableCode;
@@ -19,6 +20,8 @@ export interface MainData {
   months?: { year: number; month: number; value: number }[];
   coverage?: Coverage | null;
   dayNight?: { ok: true; max: ExtremeFit; min: ExtremeFit } | { ok: false; error: string };
+  /* GISTEMP only: live file or bundled snapshot. */
+  origin?: DataOrigin;
 }
 
 type Load<T> = { status: "loading" } | { status: "error"; error: string } | { status: "ready"; data: T };

@@ -1,0 +1,8 @@
+{
+  "fetchedAt": "2026-11-16T00:10:51Z",
+  "lastModified": "2026-11-10T13:53:24Z",
+  "files": {
+    "GLB.Ts+dSST.csv": "https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv",
+    "ZonAnn.Ts+dSST.csv": "https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts+dSST.csv"
+  }
+}

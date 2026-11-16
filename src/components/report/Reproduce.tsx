@@ -8,6 +8,7 @@ import { VARIABLES, type VariableCode } from "@/lib/data/variables";
 import { EXTREMES, POWER_END, POWER_ENDPOINT, POWER_START, powerUrl } from "@/lib/data/power";
 import { GISTEMP_URL } from "@/lib/data/gistemp";
 import { partialNote, periodText, spanOf } from "@/lib/data/range";
+import { gistempName } from "@/lib/data/origin";
 
 const UNIT_SLUG: Record<VariableCode, string> = { T2M: "c", PRECTOTCORR: "mm_per_day", RH2M: "percent", WS2M: "m_per_s" };
 
@@ -22,7 +23,7 @@ function csvFor(d: MainData, name: string, variable: VariableCode): string {
   const span = spanOf(d.analysis);
   const head = [
     `# ${name}, ${V.name} (${variable}, ${V.unit}), ${d.analysis.season === "ALL" ? "annual" : d.analysis.season} means`,
-    `# Source: ${variable === "T2M" && name === "Global" ? "NASA GISS GISTEMP v4" : "NASA POWER, MERRA-2 based, monthly"}`,
+    `# Source: ${variable === "T2M" && name === "Global" ? gistempName(d.origin) : "NASA POWER, MERRA-2 based, monthly"}`,
     ...(span ? [`# Years in the trend: ${periodText(span, name === "Global" ? "gistemp" : "power")}, complete years only`] : []),
     ...(partialNote(d.coverage, span) ? [`# ${partialNote(d.coverage, span)}`] : []),
     `# OLS trend ${t.perDecade.toFixed(6)} ${V.unit} per decade, 95% CI +/- ${t.ci95PerDecade.toFixed(6)}, regression p ${t.p.toExponential(4)}`,
@@ -92,6 +93,7 @@ export function evidenceJson(d: MainData, o: { name: string; global: boolean; la
     : [cell ? powerUrl(cell.lat, cell.lon, o.variable) : POWER_ENDPOINT, ...(d.dayNight && cell ? [powerUrl(cell.lat, cell.lon, EXTREMES.join(","))] : [])];
   return {
     generatedBy: "Anomalix, Climate Detective",
+    ...(o.global && d.origin ? { gistemp: d.origin } : {}),
     accessed: new Date().toISOString(),
     place: o.global ? "Global" : o.name,
     coordinates: o.global ? null : { lat: o.lat, lon: o.lon },

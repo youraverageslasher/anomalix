@@ -15,6 +15,7 @@ import { VARIABLES, directionWord, type VariableCode } from "@/lib/data/variable
 
 const STATE_VALUES = Object.fromEntries(grid.states.map((s) => [s.sigla, s.value]));
 import type { MapArc, MapMarker } from "@/components/v6/DotMap";
+import { gistempName } from "@/lib/data/origin";
 
 
 function Tag({ children, dot, dashed }: { children: React.ReactNode; dot?: string; dashed?: boolean }) {
@@ -151,7 +152,7 @@ export function Hero({
         ) : null}
         <p className="mt-4 text-[13.5px] leading-relaxed text-muted">
           {global
-            ? `GISTEMP v4 merges thousands of land stations and ocean measurements into one global mean${span ? `: ${periodText(span, "gistemp")}` : ""}. Anomalies are shown against ${BASELINE_LABEL}.`
+            ? `GISTEMP v4 merges thousands of land stations and ocean measurements into one global mean${span ? `: ${periodText(span, "gistemp")}` : ""}. Anomalies are shown against ${BASELINE_LABEL}.${d.origin?.kind === "snapshot" ? ` Source: ${gistempName(d.origin)}.` : ""}`
             : `${V.name} (${V.code}, ${V.unit}) from NASA POWER, MERRA-2 based, monthly${span ? `: ${periodText(span, "power")}` : ""}. The grid cell spans about 55 by 69 km: the number describes the surrounding region, not a station in the city center.`}
           {partial ? ` ${partial}` : ""}
         </p>

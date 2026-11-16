@@ -1,4 +1,5 @@
 import { analyze, type AnalyzeOptions, type Analysis } from "./analyze";
+import type { DataOrigin } from "./origin";
 import { verdict, type Verdict } from "./verdict";
 import { completeYears, fetchPower, fetchPowerExtremes, EXTREMES } from "./power";
 import type { ExtremeFit } from "./daynight";
@@ -42,6 +43,8 @@ export interface GlobalReport {
   firstYear: number;
   lastYear: number;
   coverage: Coverage | null;
+  /* Live GISTEMP file or the bundled snapshot. */
+  origin?: DataOrigin;
 }
 
 export async function cityReport(place: Place, opts: AnalyzeOptions = {}, variable: VariableCode = DEFAULT_VARIABLE, withDayNight = false): Promise<DataResult<CityReport>> {
@@ -83,6 +86,7 @@ export async function globalReport(opts: AnalyzeOptions = {}): Promise<DataResul
       firstYear: g.data.firstYear,
       lastYear: g.data.lastYear,
       coverage: g.data.coverage,
+      origin: g.data.origin,
       months: g.data.months.filter((m) => m.year >= analysis.startYear && m.year <= analysis.endYear),
     },
   };

@@ -11,6 +11,6 @@ export async function GET(req: Request) {
   const result = await globalReport(opts);
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 502 });
   return NextResponse.json(result.data, {
-    headers: { "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=86400" },
+    headers: { "Cache-Control": result.data.origin?.kind === "snapshot" ? "public, s-maxage=600, stale-while-revalidate=600" : "public, s-maxage=86400, stale-while-revalidate=86400" },
   });
 }

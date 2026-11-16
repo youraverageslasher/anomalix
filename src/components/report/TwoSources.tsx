@@ -5,6 +5,7 @@ import { Figure } from "@/components/v6/Figure";
 import { fixed, pShort, signed } from "@/lib/data/fmt";
 import { aboutRatio, agreement, alignTwoSources, type SourceFit, type TwoSources as Aligned, type YearValue } from "@/lib/data/twoSource";
 import type { Season } from "@/lib/data/types";
+import { gistempName, type DataOrigin } from "@/lib/data/origin";
 
 const LOCAL = "#EF5A4C";
 const GLOBAL = "#ECEEF1";
@@ -134,12 +135,15 @@ export function TwoSourcesFigure({
   global,
   season,
   error,
+  origin,
   className = "",
 }: {
   n: number;
   name: string;
   local: YearValue[] | null;
   planet: YearValue[] | null;
+  /* Live GISTEMP file or the bundled snapshot. */
+  origin?: DataOrigin | null;
   global: boolean;
   season: Season;
   error?: string;
@@ -149,8 +153,8 @@ export function TwoSourcesFigure({
   const unit = season === "ALL" ? "annual" : `${season}`;
   const r = global ? (planet ? alignTwoSources(planet, planet) : null) : local && planet ? alignTwoSources(local, planet) : null;
   const sourceLine = global
-    ? `NASA GISS GISTEMP v4, GLB.Ts+dSST.${r ? ` ${r.years[0]}-${r.years[r.years.length - 1]}.` : ""}`
-    : `NASA POWER monthly point, T2M, MERRA-2 based, and NASA GISS GISTEMP v4, GLB.Ts+dSST.${r ? ` Common years ${r.years[0]}-${r.years[r.years.length - 1]}.` : ""}`;
+    ? `${gistempName(origin)}, GLB.Ts+dSST.${r ? ` ${r.years[0]}-${r.years[r.years.length - 1]}.` : ""}`
+    : `NASA POWER monthly point, T2M, MERRA-2 based, and ${gistempName(origin)}, GLB.Ts+dSST.${r ? ` Common years ${r.years[0]}-${r.years[r.years.length - 1]}.` : ""}`;
 
   if (!r) {
     return (

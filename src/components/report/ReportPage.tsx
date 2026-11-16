@@ -28,6 +28,7 @@ import { CountUp } from "@/components/v6/motion";
 import { fixed, pShort, signed, reportCode, todayLabel } from "@/lib/data/fmt";
 import { VARIABLES } from "@/lib/data/variables";
 import { Chart, AXIS_TEXT, GRID_LINE, TOOLTIP } from "./Chart";
+import { gistempName } from "@/lib/data/origin";
 
 function Skeleton() {
   return (
@@ -122,7 +123,7 @@ export function ReportPage() {
         partial={partialNote(d?.coverage, S)}
         today={todayLabel()}
         cardHref={share}
-        source={p.global ? "NASA GISS GISTEMP v4 · temperature" : `NASA POWER, MERRA-2 based, monthly · ${V.name} (${V.unit})`}
+        source={p.global ? `${gistempName(d?.origin)} · temperature` : `NASA POWER, MERRA-2 based, monthly · ${V.name} (${V.unit})`}
       />
       <Controls p={p} update={update} />
 
@@ -225,7 +226,7 @@ export function ReportPage() {
                 n={5}
                 title={`${d.analysis.anomalies.length} years in ${d.analysis.anomalies.length} stripes`}
                 caption={`Each stripe is one ${p.season === "ALL" ? "year" : `${p.season} season`}, colored by its anomaly against the ${BASELINE_LABEL} mean. Blue ran cooler, red warmer.`}
-                source={`${p.global ? "NASA GISS GISTEMP v4" : "NASA POWER (MERRA-2)"}, ${F}-${T}.`}
+                source={`${p.global ? gistempName(d.origin) : "NASA POWER (MERRA-2)"}, ${F}-${T}.`}
               >
                 <Stripes anomalies={d.analysis.anomalies} height={110} rounded={8} />
                 <div className="mt-2 flex justify-between text-[12px] text-muted tnum">
@@ -266,7 +267,7 @@ export function ReportPage() {
             from={F}
             to={T}
             season={p.season}
-            source={`${p.global ? "NASA GISS GISTEMP v4" : `NASA POWER (MERRA-2), ${V.code}`}, ${F}-${T}${seasonNote}.`}
+            source={`${p.global ? gistempName(d.origin) : `NASA POWER (MERRA-2), ${V.code}`}, ${F}-${T}${seasonNote}.`}
           />
 
           <Reproduce variable={p.variable} d={d} name={p.name || "This place"} global={p.global} lat={p.lat} lon={p.lon} from={F} to={T} season={p.season} />

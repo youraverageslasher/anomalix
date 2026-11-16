@@ -10,7 +10,8 @@
     "test": "vitest run",
     "build:grid": "tsx scripts/build-brazil-grid.mjs",
     "build:topo": "node scripts/build-brazil-topo.mjs",
-    "build:decades": "tsx scripts/build-brazil-decades.mjs"
+    "build:decades": "tsx scripts/build-brazil-decades.mjs",
+    "build:gistemp": "node scripts/build-gistemp-snapshot.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.2",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/d3-geo": "^3.1.1",
+    "@types/geojson": "^7946.0.16",
     "@types/node": "^20.16.11",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",

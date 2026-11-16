@@ -21,6 +21,7 @@ import { DecompVisual } from "./DecompVisual";
 import { StatsVisual } from "./StatsVisual";
 import { VerdictVisual } from "./VerdictVisual";
 import { MIN_SERIES_YEARS, WINDOW_YEARS } from "@/lib/data/windows";
+import { gistempName } from "@/lib/data/origin";
 
 const STATE_VALUES = Object.fromEntries(grid.states.map((s) => [s.sigla, s.value]));
 const DEFAULT = { name: "São José do Rio Preto, SP", lat: -20.81, lon: -49.38 };
@@ -199,7 +200,7 @@ export function MethodPage() {
             <h3 className="mt-3 font-serif text-[26px] leading-tight text-text">Local and global, side by side</h3>
             <p className="mt-4 font-serif text-[44px] leading-none text-text">{two ? <CountUp value={two.global.trend.perDecade} format={(v) => signed(v)} /> : "…"}</p>
             <p className="mt-3 text-[14px] text-body">
-              NASA GISTEMP for the planet, on the same years as the place{two ? ` (${two.years[0]}-${two.years[two.years.length - 1]}, °C per decade)` : ""}. A comparison, not a proof.
+              NASA GISTEMP for the planet, on the same years as the place{two ? ` (${two.years[0]}-${two.years[two.years.length - 1]}, °C per decade)` : ""}. A comparison, not a proof.{g?.origin?.kind === "snapshot" ? ` Source: ${gistempName(g.origin)}.` : ""}
             </p>
           </Reveal>
           <Reveal className="border-t border-rule p-8 md:border-l md:border-t-0">

@@ -12,6 +12,7 @@ import { VARIABLES, type VariableCode } from "@/lib/data/variables";
 import type { DecadeGrid } from "@/lib/data/decades";
 import type { MainData } from "./useReportData";
 import decadesRaw from "../../../public/data/brazil-decades.json";
+import { gistempName } from "@/lib/data/origin";
 
 const DECADES = decadesRaw as DecadeGrid;
 const STATE_NAMES = Object.fromEntries(brazilStates().map((f) => [f.properties.sigla, f.properties.nome]));
@@ -144,7 +145,7 @@ export function Seasons({ d, variable, global = false }: { d: MainData; variable
       <p className="mt-2 text-[12px] leading-relaxed text-muted">
         Four tests, so the bar is stricter: p and the autocorrelation adjusted p must both be under {fixed(BONFERRONI_P, 4)} (Bonferroni), with Theil-Sen and Mann-Kendall agreeing. Dec to Feb uses January, February and December of the same calendar year.
       </p>
-      <p className="mt-2 text-[12px] text-muted">{global ? "NASA GISS GISTEMP v4, global monthly means." : `NASA POWER ${V.code}, MERRA-2 based, monthly.`}</p>
+      <p className="mt-2 text-[12px] text-muted">{global ? `${gistempName(d.origin)}, global monthly means.` : `NASA POWER ${V.code}, MERRA-2 based, monthly.`}</p>
     </Shell>
   );
 }
