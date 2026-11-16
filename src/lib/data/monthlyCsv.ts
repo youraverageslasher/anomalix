@@ -11,6 +11,11 @@ export interface TidyRow extends MonthValue {
   partialYear: boolean;
 }
 
+/* Valid months after the last complete year, kept only when the report period reaches that year. */
+export function partialMonthsFor(all: MonthValue[], lastComplete: number, periodEnd: number): MonthValue[] {
+  return periodEnd >= lastComplete ? all.filter((m) => m.year > lastComplete) : [];
+}
+
 export const MONTHLY_COLUMNS = ["place", "lat", "lon", "parameter", "year", "month", "date", "value", "climatology", "anomaly", "partial_year"] as const;
 
 /*

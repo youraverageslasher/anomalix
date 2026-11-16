@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { monthlyCsv, monthlyFilename, monthlyTidy, MONTHLY_COLUMNS, type MonthValue } from "@/lib/data/monthlyCsv";
+import { monthlyCsv, monthlyFilename, monthlyTidy, partialMonthsFor, MONTHLY_COLUMNS, type MonthValue } from "@/lib/data/monthlyCsv";
 import { parsePowerMonthly } from "@/lib/data/power";
 
 /* Three complete years with a seasonal cycle and a small trend. */
@@ -45,5 +45,11 @@ describe("monthly tidy export", () => {
     expect(csv[1].startsWith('"São José do Rio Preto, SP",-20.8197,-49.3794,RH2M,2023,1,2023-01-01,')).toBe(true);
     expect(csv.at(-1)).toMatch(/,2026,3,2026-03-01,30,.*,true$/);
     expect(monthlyFilename("RH2M", -20.81972, -49.37944)).toBe("anomalix_RH2M_-20.8197_-49.3794_monthly.csv");
+  });
+  it("keeps the partial year when the period reaches the last complete year, whether it ends there or later", () => {
+    const all: MonthValue[] = [...complete, { year: 2026, month: 1, value: 1 }, { year: 2026, month: 2, value: 2 }];
+    expect(partialMonthsFor(all, 2025, 2025).length).toBe(2);
+    expect(partialMonthsFor(all, 2025, 2026).length).toBe(2);
+    expect(partialMonthsFor(all, 2025, 2024)).toEqual([]);
   });
 });

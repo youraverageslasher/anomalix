@@ -7,6 +7,7 @@ import { DEFAULT_VARIABLE, type VariableCode } from "./variables";
 import { fetchGistemp } from "./gistemp";
 import type { DataResult, Place } from "./types";
 import { coverage, spanOf, type Coverage } from "./range";
+import { partialMonthsFor } from "./monthlyCsv";
 
 export interface CityReport {
   variable: VariableCode;
@@ -71,7 +72,7 @@ export async function cityReport(place: Place, opts: AnalyzeOptions = {}, variab
       coverage: coverage(power.data.months),
       ...(dayNight ? { dayNight } : {}),
       months: months.filter((m) => m.year >= analysis.startYear && m.year <= analysis.endYear),
-      partialMonths: power.data.months.filter((m) => m.year > lastComplete && analysis.endYear === lastComplete),
+      partialMonths: partialMonthsFor(power.data.months, lastComplete, analysis.endYear),
     },
   };
 }
