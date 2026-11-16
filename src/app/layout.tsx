@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/ui/SiteFooter";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  other: { google: "notranslate" },
   title: "Anomalix · Is your city's climate actually shifting, or is it just natural noise?",
   description:
     "Is your city's climate actually shifting, or is it just natural noise? Type any city on Earth and get an honest verdict from open NASA data: the rate, the margin of error and significance tests, with Inconclusive when the signal is not there.",
@@ -14,7 +15,7 @@ export const viewport: Viewport = { themeColor: "#0D1015" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
+    <html lang="en" translate="no" className={`notranslate ${serif.variable} ${sans.variable}`}>
       <body className="flex min-h-screen flex-col">
         <a
           href="#main"
