@@ -196,10 +196,17 @@ export function drawCard(ctx: CanvasRenderingContext2D, input: CardInput, host: 
   ctx.moveTo(M, 1180);
   ctx.lineTo(W - M, 1180);
   ctx.stroke();
+  ctx.font = `600 20px ${SANS}`;
+  const hostW = ctx.measureText(host).width;
   ctx.fillStyle = C.muted;
   ctx.font = `400 18px ${SANS}`;
-  ctx.fillText(V.temperature ? "Data: NASA POWER (MERRA-2) · NASA GISS GISTEMP v4" : `Data: NASA POWER, MERRA-2 based, monthly · ${V.name} (${V.code})`, M, 1226);
-  ctx.fillText(`Grid cell ≈ ${cellText(input.lat)}, not a single station. Trends, not causes.`, M, 1258);
+  /* The data line shares its row with the host on the right; when it would run into it, it breaks at the " · ". */
+  const data = V.temperature ? "Data: NASA POWER (MERRA-2) · NASA GISS GISTEMP v4" : `Data: NASA POWER, MERRA-2 based, monthly · ${V.name} (${V.code})`;
+  const room = W - 2 * M - hostW - 32;
+  const parts = data.split(" · ");
+  const lines = ctx.measureText(data).width <= room || parts.length < 2 ? [data] : [`${parts[0]} ·`, parts.slice(1).join(" · ")];
+  lines.forEach((l, i) => ctx.fillText(l, M, 1226 + i * 32));
+  ctx.fillText(`Grid cell ≈ ${cellText(input.lat)}, not a single station. Trends, not causes.`, M, 1226 + lines.length * 32);
   ctx.fillStyle = C.text;
   ctx.font = `600 20px ${SANS}`;
   ctx.textAlign = "right";

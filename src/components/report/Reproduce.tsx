@@ -12,11 +12,12 @@ import { gistempName } from "@/lib/data/origin";
 import { monthlyCsv, monthlyFilename, monthlyTidy } from "@/lib/data/monthlyCsv";
 import { placeParam } from "@/lib/data/pairCompare";
 
+/* Levels use the parameter unit; anomalies are changes, so relative humidity anomalies are percentage points. */
 const UNIT_SLUG: Record<VariableCode, string> = { T2M: "c", PRECTOTCORR: "mm_per_day", RH2M: "percent", WS2M: "m_per_s" };
+const CHANGE_SLUG: Record<VariableCode, string> = { T2M: "c", PRECTOTCORR: "mm_per_day", RH2M: "pp", WS2M: "m_per_s" };
 
 function csvFor(d: MainData, name: string, variable: VariableCode): string {
-  const u = UNIT_SLUG[variable];
-  const rows = [["year", `mean_${u}`, `anomaly_vs_1981_2010_${u}`]];
+  const rows = [["year", `mean_${UNIT_SLUG[variable]}`, `anomaly_vs_1981_2010_${CHANGE_SLUG[variable]}`]];
   const anom = new Map(d.analysis.anomalies.map((a) => [a.year, a.value]));
   for (const a of d.analysis.annual) rows.push([String(a.year), a.value.toFixed(4), (anom.get(a.year) ?? NaN).toFixed(4)]);
   const V = VARIABLES[variable];
@@ -100,7 +101,9 @@ export function evidenceJson(d: MainData, o: { name: string; global: boolean; la
     place: o.global ? "Global" : o.name,
     coordinates: o.global ? null : { lat: o.lat, lon: o.lon },
     powerCell: cell,
-    variable: { code: o.variable, name: V.name, unit: V.unit },
+    variable: { code: o.variable, name: V.name, unit: V.unit, changeUnit: V.change },
+    /* Unit of every slope, interval and change below (ols, theilSen, residualSd, acceleration). */
+    trendUnit: `${V.change} per decade`,
     season: o.season,
     yearRange: span ? { from: span.from, to: span.to, completeYears: span.n } : null,
     coverage: d.coverage ?? null,
@@ -165,7 +168,7 @@ export function Reproduce({ variable = "T2M", d, name, global, lat, lon, from, t
           </p>
           {!global && (
             <p id="monthly-help" className="mt-2 text-[12px] text-muted">
-              Monthly CSV: one row per valid month. Anomaly is deseasonalized: the value minus that calendar month&apos;s mean over the exported months.
+              Monthly CSV: one row per valid month. Anomaly is deseasonalized, in {V.change}: the value minus that calendar month&apos;s mean over the exported months.
             </p>
           )}
         </div>
