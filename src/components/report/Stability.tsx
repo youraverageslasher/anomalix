@@ -161,7 +161,7 @@ export function ZonalComparison({ d, lat, name, variable, global, sigla }: { d: 
           ))}
         </ol>
         <p className="mt-4 text-[13.5px] leading-relaxed text-body">
-          A side by side comparison, not proof of anything about the place. The place, band and planet use the same {b.years.length} years; the state value comes from the Brazil grid over its own period.
+          A side by side comparison, not proof of anything about the place. The place, band and planet use the same {b.years.length} years{state ? "; the state value comes from the Brazil grid over its own period" : ""}.
         </p>
         <p className="mt-2 break-words text-[12px] text-muted">
           Sources: NASA POWER monthly point API; {ZONAL_URL}
