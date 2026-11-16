@@ -49,7 +49,7 @@ export function WindowStability({ d, variable, global = false }: { d: MainData; 
             return (
               <span
                 key={w.from}
-                title={`${w.from}-${w.to}: ${signed(w.trend.perDecade, V.digits)} ${V.unit} per decade, adjusted p ${fixed(w.trend.pAdj, 3)}${w.significant ? ", significant" : ""}`}
+                title={`${w.from}-${w.to}: ${signed(w.trend.perDecade, V.digits)} ${V.change} per decade, adjusted p ${fixed(w.trend.pAdj, 3)}${w.significant ? ", significant" : ""}`}
                 className="h-[34px] min-w-0 flex-1 rounded-[3px]"
                 style={{ background: w.significant ? c : "transparent", boxShadow: `inset 0 0 0 1.5px ${c}` }}
               />

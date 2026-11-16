@@ -60,7 +60,7 @@ export function ReportPage() {
   const { main, planet, compare } = useReportData(p);
   const code = useMemo(() => reportCode(`${p.global ? "G" : `${p.lat.toFixed(2)},${p.lon.toFixed(2)}`}|${p.from}|${p.to}|${p.season}|${p.variable}`), [p]);
   const V = VARIABLES[p.variable];
-  const du = `${V.unit}/decade`;
+  const du = `${V.change} per decade`;
   const sp = useSearchParams();
   const share = !p.global && p.valid ? `/card?${sp.toString()}` : null;
 
@@ -151,7 +151,7 @@ export function ReportPage() {
                 { label: "OLS trend", value: <><CountUp value={d.analysis.trend.perDecade} format={(x) => signed(x, V.digits)} /><Unit>{du}</Unit></> },
                 { label: "95% CI", value: <><CountUp value={d.analysis.trend.ci95PerDecade} format={(x) => `± ${fixed(x, V.digits)}`} /><Unit>{du}</Unit></> },
                 { label: "p-value (regression)", value: pShort(d.analysis.trend.p) },
-                { label: `Total ${F}-${T}`, value: <><CountUp value={d.analysis.totalChange} format={(x) => signed(x, V.digits >= 3 ? 2 : 1)} /><Unit>{V.unit}</Unit></> },
+                { label: `Total ${F}-${T}`, value: <><CountUp value={d.analysis.totalChange} format={(x) => signed(x, V.digits >= 3 ? 2 : 1)} /><Unit>{V.change}</Unit></> },
               ]}
             />
             <div className="mt-3 grid grid-cols-1 gap-x-8 gap-y-3 rounded-card-sm border border-rule bg-card px-6 py-4 md:grid-cols-[auto_1fr] md:items-center">
@@ -241,17 +241,17 @@ export function ReportPage() {
               <Figure
                 n={5}
                 title={`${d.analysis.anomalies.length} years against their ${BASELINE_LABEL} mean`}
-                caption={`Each bar is one ${p.season === "ALL" ? "year" : `${p.season} season`} of ${V.name.toLowerCase()}, above or below its ${BASELINE_LABEL} mean, in ${V.unit}. One neutral color: the blue to red scale is kept for temperature.`}
+                caption={`Each bar is one ${p.season === "ALL" ? "year" : `${p.season} season`} of ${V.name.toLowerCase()}, above or below its ${BASELINE_LABEL} mean, in ${V.change}. One neutral color: the blue to red scale is kept for temperature.`}
                 source={`NASA POWER (MERRA-2), ${V.code}, ${F}-${T}.`}
               >
                 <Chart
                   height={180}
-                  label={`Yearly ${V.name.toLowerCase()} anomalies against ${BASELINE_LABEL}, ${V.unit}`}
+                  label={`Yearly ${V.name.toLowerCase()} anomalies against ${BASELINE_LABEL}, ${V.change}`}
                   option={{
                     grid: { left: 64, right: 12, top: 12, bottom: 28 },
-                    tooltip: { ...TOOLTIP, trigger: "axis", valueFormatter: (x: number) => `${signed(x, V.digits)} ${V.unit}` },
+                    tooltip: { ...TOOLTIP, trigger: "axis", valueFormatter: (x: number) => `${signed(x, V.digits)} ${V.change}` },
                     xAxis: { type: "category", data: d.analysis.anomalies.map((a) => a.year), axisLabel: { ...AXIS_TEXT, interval: 9 }, axisTick: { show: false }, axisLine: { lineStyle: { color: "#2B323C" } } },
-                    yAxis: { type: "value", axisLabel: { ...AXIS_TEXT, formatter: (x: number) => `${signed(x, V.digits >= 3 ? 2 : 1)} ${V.unit}` }, splitLine: GRID_LINE },
+                    yAxis: { type: "value", axisLabel: { ...AXIS_TEXT, formatter: (x: number) => `${signed(x, V.digits >= 3 ? 2 : 1)} ${V.code === "RH2M" ? "pp" : V.change}` }, splitLine: GRID_LINE },
                     series: [{ type: "bar", data: d.analysis.anomalies.map((a) => +a.value.toFixed(4)), itemStyle: { color: "#B3BBC7", borderRadius: 2 }, barCategoryGap: "25%" }],
                   }}
                 />

@@ -1,7 +1,7 @@
 import { normalCdf } from "../stats";
 import { powerCell } from "./power";
 
-/* Correlation at or above this marks two places as climatically linked: the z test then overstates significance. */
+/* Correlation at or above this marks two places as climatically linked: the z test assumes independence, which may not hold. */
 export const LINK_R = 0.5;
 export const Z95 = 1.96;
 
@@ -51,7 +51,7 @@ export function isLinked(r: number): boolean {
 }
 
 export function linkWarning(r: number): string {
-  return `These places are climatically linked (r = ${r.toFixed(2)}): their series move together, so this test overstates significance. Treat the result as an upper bound.`;
+  return `These places are climatically linked (r = ${r.toFixed(2)}). The independence assumption may not hold, so treat this comparison's p value and interval cautiously.`;
 }
 
 /* Same NASA POWER grid cell (0.5 by 0.625 degrees): comparing would compare a series with itself. */

@@ -16,7 +16,7 @@ export interface CityCardData {
   variable?: VariableCode;
 }
 
-const unitOf = (d: CityCardData) => `${VARIABLES[d.variable ?? "T2M"].unit}/decade`;
+const unitOf = (d: CityCardData) => `${VARIABLES[d.variable ?? "T2M"].change} per decade`;
 const isTemp = (d: CityCardData) => (d.variable ?? "T2M") === "T2M";
 const digitsOf = (d: CityCardData) => VARIABLES[d.variable ?? "T2M"].digits;
 

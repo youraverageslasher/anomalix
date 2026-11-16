@@ -45,8 +45,8 @@ export function agreementNote(d: MainData): string {
 export function verdictSentence(d: MainData, from: number, to: number, variable: VariableCode = "T2M"): { lead: string; body: string } {
   const V = VARIABLES[variable];
   const t = d.analysis.trend;
-  const rate = `${signed(t.perDecade, V.digits)} ± ${fixed(t.ci95PerDecade, V.digits)} ${V.unit} per decade since ${from}`;
-  const total = `${signed(d.analysis.totalChange, V.digits >= 3 ? 2 : 1)} ${V.unit}`;
+  const rate = `${signed(t.perDecade, V.digits)} ± ${fixed(t.ci95PerDecade, V.digits)} ${V.change} per decade since ${from}`;
+  const total = `${signed(d.analysis.totalChange, V.digits >= 3 ? 2 : 1)} ${V.change}`;
   if (d.verdict.confidence === "Inconclusive") {
     return {
       lead: "Inconclusive.",
@@ -136,7 +136,7 @@ export function Hero({
           <CountUp value={t.perDecade} format={(x) => signed(x, V.digits)} />
         </p>
         <p className="mt-2 font-serif text-[24px] italic text-body">
-          {V.unit} per decade{V.temperature ? "" : ` · ${V.name.toLowerCase()}`}
+          {V.change} per decade{V.temperature ? "" : ` · ${V.name.toLowerCase()}`}
         </p>
         <p className="mt-6 text-bodyl text-body">
           <strong className="font-semibold text-text">{sentence.lead}</strong> {sentence.body}

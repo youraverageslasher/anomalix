@@ -28,8 +28,8 @@ function csvFor(d: MainData, name: string, variable: VariableCode): string {
     `# Source: ${variable === "T2M" && name === "Global" ? gistempName(d.origin) : "NASA POWER, MERRA-2 based, monthly"}`,
     ...(span ? [`# Years in the trend: ${periodText(span, name === "Global" ? "gistemp" : "power")}, complete years only`] : []),
     ...(partialNote(d.coverage, span) ? [`# ${partialNote(d.coverage, span)}`] : []),
-    `# OLS trend ${t.perDecade.toFixed(6)} ${V.unit} per decade, 95% CI +/- ${t.ci95PerDecade.toFixed(6)}, regression p ${t.p.toExponential(4)}`,
-    `# Mann-Kendall S ${mk.s}, Z ${mk.z.toFixed(4)}, p ${mk.p.toExponential(4)}, Sen's slope ${mk.senPerDecade.toFixed(6)} ${V.unit} per decade`,
+    `# OLS trend ${t.perDecade.toFixed(6)} ${V.change} per decade, 95% CI +/- ${t.ci95PerDecade.toFixed(6)}, regression p ${t.p.toExponential(4)}`,
+    `# Mann-Kendall S ${mk.s}, Z ${mk.z.toFixed(4)}, p ${mk.p.toExponential(4)}, Sen's slope ${mk.senPerDecade.toFixed(6)} ${V.change} per decade`,
   ];
   return `${head.join("\n")}\n${rows.map((r) => r.join(",")).join("\n")}\n`;
 }
@@ -66,9 +66,9 @@ for y in range(${from}, ${to} + 1):
     if all(k in m for k in keys):
         years.append(y); means.append(np.mean([m[k] for k in keys]))
 fit = linregress(years, means)
-print(f"OLS trend: {fit.slope * 10:+.${V.digits}f} ${V.unit} per decade, regression p = {fit.pvalue:.3g}")
+print(f"OLS trend: {fit.slope * 10:+.${V.digits}f} ${V.change} per decade, regression p = {fit.pvalue:.3g}")
 r = mk.original_test(means)
-print(f"Mann-Kendall: Z = {r.z:.2f}, p = {r.p:.3g}, Sen's slope = {r.slope * 10:+.${V.digits}f} ${V.unit} per decade")
+print(f"Mann-Kendall: Z = {r.z:.2f}, p = {r.p:.3g}, Sen's slope = {r.slope * 10:+.${V.digits}f} ${V.change} per decade")
 `;
 }
 
@@ -161,7 +161,7 @@ export function Reproduce({ variable = "T2M", d, name, global, lat, lon, from, t
           <h2 id="reproduce" className="font-serif text-figure text-text">Check our work</h2>
           <p className="mt-2 text-[14px] leading-relaxed text-body">
             Download the {d.analysis.annual.length} yearly values behind this report, or copy a short Python script that pulls the same NASA data and
-            should print {signed(d.analysis.trend.perDecade, V.digits)} {V.unit} per decade, plus the Mann-Kendall check.
+            should print {signed(d.analysis.trend.perDecade, V.digits)} {V.change} per decade, plus the Mann-Kendall check.
           </p>
           {!global && (
             <p id="monthly-help" className="mt-2 text-[12px] text-muted">

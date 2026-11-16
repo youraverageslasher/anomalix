@@ -62,6 +62,7 @@ export function Anatomy({
   const t = a.trend;
   const V = VARIABLES[variable];
   const U = V.unit;
+  const C = V.change;
   const ax = V.digits >= 3 ? 1 : 0;
   const lineColor = V.temperature ? "#EF5A4C" : "#ECEEF1";
   const pointColor = V.temperature ? "#ECEEF1" : NEUTRAL_SERIES;
@@ -129,9 +130,9 @@ export function Anatomy({
 
   const resid = {
     grid: GRID,
-    tooltip: { ...TOOLTIP, trigger: "axis", axisPointer: { ...TOOLTIP.axisPointer, type: "line" }, valueFormatter: (v: number) => `${signed(v, V.digits)} ${U}` },
+    tooltip: { ...TOOLTIP, trigger: "axis", axisPointer: { ...TOOLTIP.axisPointer, type: "line" }, valueFormatter: (v: number) => `${signed(v, V.digits)} ${C}` },
     xAxis: yearAxis(from, to + 1, to),
-    yAxis: valueAxis(U, ax, true),
+    yAxis: valueAxis(V.code === "RH2M" ? "pp" : C, ax, true),
     series: [
       {
         name: "Residual",
@@ -164,7 +165,7 @@ export function Anatomy({
         <p className="text-[14px] text-muted">Each figure answers one question</p>
       </div>
       <div className="anatomy-seq mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Figure n={6} className="lg:col-span-2" title="Annual series and trend" source={source} caption={`${a.annual.length} ${unitWord} means of ${V.name.toLowerCase()}, ${from}-${to}. The ${V.temperature ? "red" : "bright"} OLS line is the trend under test: ${signed(t.perDecade, V.digits)} ${U} per decade. Mann-Kendall, on the same series, gives ${pLabel(a.mk.p)} and a Sen's slope of ${signed(a.mk.senPerDecade, V.digits)} ${U} per decade.`}>
+        <Figure n={6} className="lg:col-span-2" title="Annual series and trend" source={source} caption={`${a.annual.length} ${unitWord} means of ${V.name.toLowerCase()}, ${from}-${to}. The ${V.temperature ? "red" : "bright"} OLS line is the trend under test: ${signed(t.perDecade, V.digits)} ${C} per decade. Mann-Kendall, on the same series, gives ${pLabel(a.mk.p)} and a Sen's slope of ${signed(a.mk.senPerDecade, V.digits)} ${C} per decade.`}>
           <Key items={[["OLS trend", lineColor], [season === "ALL" ? "Annual mean" : `${season} mean`, pointColor]]} />
           <Chart height={300} option={series} label={`Line chart of ${a.annual.length} ${unitWord} means with the OLS trend line`} />
         </Figure>
@@ -184,7 +185,7 @@ export function Anatomy({
         <Figure n={V.temperature ? 8 : 7} title="Seasonality" source={`${global ? gistempName(d.origin) : "NASA POWER (MERRA-2)"}, ${BASELINE_LABEL}.`} caption={V.temperature ? "The 1981-2010 seasonal cycle, removed before measuring the trend. Skip that step and an ordinary summer would pass for warming." : `The 1981-2010 seasonal cycle of ${V.name.toLowerCase()}, removed before measuring the trend, so an ordinary wet or windy season is never read as a trend.`}>
           <Chart option={clim} label={`Monthly climatology for ${BASELINE_LABEL}`} />
         </Figure>
-        <Figure n={V.temperature ? 9 : 8} title="Residual" source={source} caption={V.temperature ? "What is left after removing the seasonal cycle and the trend. Red months ran warm, blue months cool." : `What is left after removing the seasonal cycle and the trend, in ${U}. Noisy residuals are why ${V.short.toLowerCase()} trends are often inconclusive.`}>
+        <Figure n={V.temperature ? 9 : 8} title="Residual" source={source} caption={V.temperature ? "What is left after removing the seasonal cycle and the trend. Red months ran warm, blue months cool." : `What is left after removing the seasonal cycle and the trend, in ${C}. Noisy residuals are why ${V.short.toLowerCase()} trends are often inconclusive.`}>
           <Chart option={resid} label={`Bar chart of monthly residuals in ${U}`} />
         </Figure>
         {!global && !V.temperature && (

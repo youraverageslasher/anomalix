@@ -139,7 +139,7 @@ export function Seasons({ d, variable, global = false }: { d: MainData; variable
     <Shell title="Seasons" kicker={`calendar quarters, ${first}-${last}`}>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {fits.map((f) => (
-          <SeasonCell key={f.id} f={f} max={max} unit={V.unit} digits={V.digits} pulling={pull?.id === f.id} />
+          <SeasonCell key={f.id} f={f} max={max} unit={V.change} digits={V.digits} pulling={pull?.id === f.id} />
         ))}
       </div>
       <p className={`mt-4 text-[14.5px] leading-relaxed ${pull ? "font-semibold text-text" : "text-body"}`}>

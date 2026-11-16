@@ -16,7 +16,7 @@ export function RigorRow({ d, variable }: { d: MainData; variable: VariableCode 
   const t = d.analysis.trend;
   const acc = d.analysis.acceleration;
   const v = d.verdict;
-  const du = `${V.unit}/decade`;
+  const du = `${V.change} per decade`;
   const rows: [string, React.ReactNode][] = [
     [
       "Theil-Sen median slope",
@@ -36,7 +36,7 @@ export function RigorRow({ d, variable }: { d: MainData; variable: VariableCode 
       acc ? (
         <>
           <span className="text-text">{PACE_LABELS[acc.pace].en.charAt(0).toUpperCase() + PACE_LABELS[acc.pace].en.slice(1)}</span>: last {acc.years} years ({acc.from}-{acc.to}){" "}
-          {signed(acc.recent.perDecade, V.digits)} ± {fixed(acc.recent.halfWidth, V.digits)} against {signed(acc.full, V.digits)} ± {fixed(acc.fullSe, V.digits)} (standard error) {du} for the full series{" "}
+          {signed(acc.recent.perDecade, V.digits)} ± {fixed(acc.recent.halfWidth, V.digits)} (95% confidence interval) against {signed(acc.full, V.digits)} ± {fixed(acc.fullSe, V.digits)} (standard error) {du} for the full series{" "}
           <span className="text-muted">(descriptive comparison, not a formal significance test)</span>
         </>
       ) : (
@@ -74,8 +74,8 @@ export function SignalNoise({ d, variable, from, to, global = false }: { d: Main
   const sig = d.verdict.confidence !== "Inconclusive";
   const digits = V.digits >= 3 ? 3 : 2;
   const sentence = sig
-    ? `Across ${from}-${to} the trend adds up to ${fixed(signal, digits)} ${V.unit}, ${Number.isFinite(ratio) ? `about ${fixed(ratio, 1)} times` : "well above"} the typical year to year noise of ${fixed(noise, digits)} ${V.unit}. The signal rises clearly above the noise, which is why the test can tell it apart from chance.`
-    : `Across ${from}-${to} the trend adds up to ${fixed(signal, digits)} ${V.unit}, ${ratio < 1 ? "smaller than" : ratio < 2 ? "about the size of" : `about ${fixed(ratio, 1)} times`} the typical year to year noise of ${fixed(noise, digits)} ${V.unit}. ${ratio < 2 ? "The signal does not stand out from the noise, so chance cannot be ruled out." : "Even so, the tests cannot rule out chance with enough confidence, so the verdict stays Inconclusive."}`;
+    ? `Across ${from}-${to} the trend adds up to ${fixed(signal, digits)} ${V.change}, ${Number.isFinite(ratio) ? `about ${fixed(ratio, 1)} times` : "well above"} the typical year to year noise of ${fixed(noise, digits)} ${V.change}. The signal rises clearly above the noise, which is why the test can tell it apart from chance.`
+    : `Across ${from}-${to} the trend adds up to ${fixed(signal, digits)} ${V.change}, ${ratio < 1 ? "smaller than" : ratio < 2 ? "about the size of" : `about ${fixed(ratio, 1)} times`} the typical year to year noise of ${fixed(noise, digits)} ${V.change}. ${ratio < 2 ? "The signal does not stand out from the noise, so chance cannot be ruled out." : "Even so, the tests cannot rule out chance with enough confidence, so the verdict stays Inconclusive."}`;
   const bar = (value: number, color: string, label: string) => (
     <div className="grid grid-cols-[64px_1fr_auto] items-center gap-3">
       <span className="text-[12.5px] text-muted">{label}</span>
@@ -83,7 +83,7 @@ export function SignalNoise({ d, variable, from, to, global = false }: { d: Main
         <span className="block h-full rounded-full motion-safe:transition-[width] motion-safe:duration-700" style={{ width: `${Math.max(1, (value / max) * 100)}%`, background: color }} />
       </span>
       <span className="text-[13px] text-text tnum">
-        {fixed(value, digits)} {V.unit}
+        {fixed(value, digits)} {V.change}
       </span>
     </div>
   );
@@ -91,9 +91,9 @@ export function SignalNoise({ d, variable, from, to, global = false }: { d: Main
     <figure className="flex h-full flex-col rounded-card border border-rule bg-card p-6 shadow-card md:p-7">
       <figcaption className="flex items-baseline justify-between gap-3">
         <span className="font-serif text-figure text-text">Signal vs noise</span>
-        <span className="text-[12.5px] text-muted">same unit, {V.unit}</span>
+        <span className="text-[12.5px] text-muted">same unit, {V.change}</span>
       </figcaption>
-      <div className="mt-5 flex flex-col gap-3" role="img" aria-label={`Signal ${fixed(signal, digits)} ${V.unit} against noise ${fixed(noise, digits)} ${V.unit}`}>
+      <div className="mt-5 flex flex-col gap-3" role="img" aria-label={`Signal ${fixed(signal, digits)} ${V.change} against noise ${fixed(noise, digits)} ${V.change}`}>
         {bar(signal, sig && V.temperature ? "#EF5A4C" : "#ECEEF1", "Signal")}
         {bar(noise, "#8D97A6", "Noise")}
       </div>

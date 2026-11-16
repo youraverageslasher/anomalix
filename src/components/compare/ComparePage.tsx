@@ -62,7 +62,7 @@ function Summary({ label, place, r, variable, href }: { label: string; place: Pl
       <p className="label">{label}</p>
       <h2 className="mt-2 font-serif text-[28px] font-medium leading-tight text-text">{place.name}</h2>
       <p className="mt-4 font-serif text-[44px] font-medium leading-none text-text tnum">{signed(t.perDecade, V.digits)}</p>
-      <p className="mt-1 text-[13px] text-muted">{V.unit} per decade</p>
+      <p className="mt-1 text-[13px] text-muted">{V.change} per decade</p>
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[14px]">
         <dt className="text-muted">95% interval</dt>
         <dd className="text-text tnum">± {fixed(t.ci95PerDecade, V.digits)}</dd>
@@ -93,7 +93,7 @@ function ComparisonBlock({ d, a, b, variable }: { d: PlacePairReport; a: PlaceRe
         {signed(c.delta, V.digits)} <span className="text-[22px] text-body">± {fixed(c.half95, V.digits)}</span>
       </p>
       <p className="mt-1 text-[13px] text-muted">
-        {V.unit} per decade, {a.name} minus {b.name}, 95% range (1.96 × standard error)
+        {V.change} per decade, {a.name} minus {b.name}, 95% range (1.96 × standard error)
       </p>
       <p className="mt-4 text-[14.5px] leading-relaxed text-body tnum">
         z = {fixed(c.z, 2)} · {pLabel(c.p)} (two-tailed) · standard error of the difference {fixed(c.seDelta, V.digits)} = √(seA² + seB²) · {d.years.length} shared years, {d.years[0]}-

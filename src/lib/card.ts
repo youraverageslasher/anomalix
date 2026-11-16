@@ -136,7 +136,7 @@ export function drawCard(ctx: CanvasRenderingContext2D, input: CardInput, host: 
   const bigW = ctx.measureText(big).width;
   ctx.fillStyle = C.muted;
   ctx.font = `400 26px ${SANS}`;
-  ctx.fillText(`${V.unit} per decade`, M + bigW + 14, 630);
+  ctx.fillText(`${V.change} per decade`, M + bigW + 14, 630);
   ctx.fillStyle = C.body;
   ctx.font = `400 24px ${SANS}`;
   ctx.fillText(`± ${fixed(t.ci95PerDecade, V.digits)} at 95% · regression ${pLabel(t.p)} · Mann-Kendall Z ${fixed(a.mk.z)}, ${pLabel(a.mk.p)}`, M, 690);
@@ -174,14 +174,14 @@ export function drawCard(ctx: CanvasRenderingContext2D, input: CardInput, host: 
   ctx.textAlign = "right";
   ctx.fillText(String(input.to), W - M, sy + sh + 34);
   ctx.textAlign = "center";
-  ctx.fillText(V.temperature ? `One stripe per year, against ${BASELINE_LABEL}` : `One bar per year, ${V.unit} against ${BASELINE_LABEL}`, W / 2, sy + sh + 34);
+  ctx.fillText(V.temperature ? `One stripe per year, against ${BASELINE_LABEL}` : `One bar per year, ${V.change} against ${BASELINE_LABEL}`, W / 2, sy + sh + 34);
   ctx.textAlign = "left";
 
   ctx.fillStyle = C.text;
   ctx.font = `400 28px ${SANS}`;
   const line1 = inconclusive
     ? "The test cannot rule out chance here. We say so."
-    : `Across ${input.from}-${input.to}, the trend adds up to ${signed(a.totalChange, V.digits >= 3 ? 2 : 1)} ${V.unit}.`;
+    : `Across ${input.from}-${input.to}, the trend adds up to ${signed(a.totalChange, V.digits >= 3 ? 2 : 1)} ${V.change}.`;
   ctx.fillText(line1, M, 1040);
   if (input.planet && V.temperature) {
     ctx.fillStyle = C.body;

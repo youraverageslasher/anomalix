@@ -34,7 +34,7 @@ describe("correlation and the linked warning", () => {
     expect(isLinked(0.49)).toBe(false);
     expect(isLinked(NaN)).toBe(false);
     expect(linkWarning(0.874)).toBe(
-      "These places are climatically linked (r = 0.87): their series move together, so this test overstates significance. Treat the result as an upper bound.",
+      "These places are climatically linked (r = 0.87). The independence assumption may not hold, so treat this comparison's p value and interval cautiously.",
     );
   });
 });
