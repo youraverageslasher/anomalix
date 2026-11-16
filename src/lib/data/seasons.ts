@@ -56,8 +56,13 @@ export function seasonFits(months: MonthValue[], minYears = 10): SeasonFit[] | n
 }
 
 /* The season with the largest slope among the strictly significant ones; null when none passes. */
-export function pullingSeason(fits: SeasonFit[]): SeasonFit | null {
-  const ok = fits.filter((f) => f.strict);
+/*
+ * Among the seasons that pass the stricter bar, the steepest one in the direction of the annual trend: the largest
+ * decline when the year is falling, the largest rise when it is rising. When the annual trend is inconclusive
+ * (direction 0), the largest magnitude either way.
+ */
+export function pullingSeason(fits: SeasonFit[], direction: -1 | 0 | 1 = 0): SeasonFit | null {
+  const ok = fits.filter((f) => f.strict && (direction === 0 || Math.sign(f.trend.perDecade) === direction));
   if (!ok.length) return null;
-  return ok.reduce((a, b) => (b.trend.perDecade > a.trend.perDecade ? b : a));
+  return ok.reduce((a, b) => (Math.abs(b.trend.perDecade) > Math.abs(a.trend.perDecade) ? b : a));
 }

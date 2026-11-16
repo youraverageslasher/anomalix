@@ -16,6 +16,7 @@ import { VARIABLES, directionWord, type VariableCode } from "@/lib/data/variable
 const STATE_VALUES = Object.fromEntries(grid.states.map((s) => [s.sigla, s.value]));
 import type { MapArc, MapMarker } from "@/components/v6/DotMap";
 import { gistempName } from "@/lib/data/origin";
+import { cellText } from "@/lib/data/cell";
 
 
 function Tag({ children, dot, dashed }: { children: React.ReactNode; dot?: string; dashed?: boolean }) {
@@ -129,7 +130,7 @@ export function Hero({
           {global ? "The whole planet" : name}
         </h1>
         <p className="mt-3 text-[14px] text-muted tnum">
-          {global ? "Global mean of land and ocean · NASA GISS GISTEMP v4" : `${search.loc?.kind === "brazil" && search.line ? `${search.line} · ` : ""}${coordText(lat, lon)} · grid cell ≈ 55 × 69 km`}
+          {global ? "Global mean of land and ocean · NASA GISS GISTEMP v4" : `${search.loc?.kind === "brazil" && search.line ? `${search.line} · ` : ""}${coordText(lat, lon)} · grid cell ≈ ${cellText(lat)}`}
         </p>
         <p className={`mt-6 font-serif text-[96px] font-medium leading-[0.9] tracking-[-0.04em] md:text-[176px] ${inconclusive ? "text-body" : "text-text"}`}>
           <CountUp value={t.perDecade} format={(x) => signed(x, V.digits)} />
@@ -153,7 +154,7 @@ export function Hero({
         <p className="mt-4 text-[13.5px] leading-relaxed text-muted">
           {global
             ? `GISTEMP v4 merges thousands of land stations and ocean measurements into one global mean${span ? `: ${periodText(span, "gistemp")}` : ""}. Anomalies are shown against ${BASELINE_LABEL}.${d.origin?.kind === "snapshot" ? ` Source: ${gistempName(d.origin)}.` : ""}`
-            : `${V.name} (${V.code}, ${V.unit}) from NASA POWER, MERRA-2 based, monthly${span ? `: ${periodText(span, "power")}` : ""}. The grid cell spans about 55 by 69 km: the number describes the surrounding region, not a station in the city center.`}
+            : `${V.name} (${V.code}, ${V.unit}) from NASA POWER, MERRA-2 based, monthly${span ? `: ${periodText(span, "power")}` : ""}. The grid cell spans about ${cellText(lat, " by ")} at this latitude: the number describes the surrounding region, not a station in the city center.`}
           {partial ? ` ${partial}` : ""}
         </p>
       </div>

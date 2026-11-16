@@ -128,7 +128,10 @@ export function Seasons({ d, variable, global = false }: { d: MainData; variable
   const fits = seasonFits(d.months);
   if (!fits) return null;
   const V = VARIABLES[variable];
-  const pull = pullingSeason(fits);
+  const conclusive = d.verdict.confidence !== "Inconclusive";
+  const direction = conclusive ? (Math.sign(d.analysis.trend.perDecade) as -1 | 0 | 1) : 0;
+  const pull = pullingSeason(fits, direction);
+  const steepest = direction === 0 ? (pull && pull.trend.perDecade < 0 ? "decline" : "rise") : direction < 0 ? "decline" : "rise";
   const max = Math.max(...fits.map((f) => Math.max(Math.abs(f.trend.ciLow), Math.abs(f.trend.ciHigh)))) || 1;
   const first = fits[0].series[0]?.year;
   const last = fits[0].series[fits[0].series.length - 1]?.year;
@@ -140,7 +143,11 @@ export function Seasons({ d, variable, global = false }: { d: MainData; variable
         ))}
       </div>
       <p className={`mt-4 text-[14.5px] leading-relaxed ${pull ? "font-semibold text-text" : "text-body"}`}>
-        {pull ? `${pull.label} is pulling the ${V.temperature ? "warming" : "trend"}: the largest slope among the seasons that pass the stricter bar.` : "No single season stands out."}
+        {pull
+          ? direction === 0
+            ? `${pull.label} moves the most: the steepest ${steepest} among the seasons that pass the stricter bar, while the yearly trend is inconclusive.`
+            : `${pull.label} is pulling the ${V.temperature && direction > 0 ? "warming" : "trend"}: the steepest ${steepest} among the seasons that pass the stricter bar.`
+          : "No single season stands out."}
       </p>
       <p className="mt-2 text-[12px] leading-relaxed text-muted">
         Four tests, so the bar is stricter: p and the autocorrelation adjusted p must both be under {fixed(BONFERRONI_P, 4)} (Bonferroni), with Theil-Sen and Mann-Kendall agreeing. Dec to Feb uses January, February and December of the same calendar year.

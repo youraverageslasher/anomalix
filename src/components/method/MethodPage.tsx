@@ -22,6 +22,7 @@ import { StatsVisual } from "./StatsVisual";
 import { VerdictVisual } from "./VerdictVisual";
 import { MIN_SERIES_YEARS, WINDOW_YEARS } from "@/lib/data/windows";
 import { gistempName } from "@/lib/data/origin";
+import { cellText } from "@/lib/data/cell";
 
 const STATE_VALUES = Object.fromEntries(grid.states.map((s) => [s.sigla, s.value]));
 const DEFAULT = { name: "São José do Rio Preto, SP", lat: -20.81, lon: -49.38 };
@@ -126,7 +127,7 @@ export function MethodPage() {
               Reports can switch to four variables: air temperature at 2 m (°C), precipitation (mm/day), relative humidity at 2 m (%) and wind speed at 2 m (m/s).
               The example here stays on temperature. We drop the annual summary key, the -999 fill value and any year with a missing month.
             </p>
-            <p>NASA POWER serves the MERRA-2 grid: 0.5° of latitude by 0.625° of longitude, about 55 by 69 km at the equator, narrower east to west toward the poles. The result describes that cell, a region, not a single thermometer.</p>
+            <p>NASA POWER serves the MERRA-2 grid: 0.5° of latitude by 0.625° of longitude, about {cellText(0, " by ")} at the equator and narrower east to west toward the poles (about {cellText(-20.81, " by ")} at São José do Rio Preto, {cellText(78.22, " by ")} at Longyearbyen). The result describes that cell, a region, not a single thermometer.</p>
           </StepShell>
 
           <StepShell

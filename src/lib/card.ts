@@ -4,6 +4,7 @@ import type { Verdict } from "./data/verdict";
 import { stripeColor } from "./data/color";
 import { coordText, fixed, pLabel, signed } from "./data/fmt";
 import { VARIABLES, directionWord, NEUTRAL_SERIES, type VariableCode } from "./data/variables";
+import { cellText } from "./data/cell";
 
 export const CARD_W = 1080;
 export const CARD_H = 1350;
@@ -198,7 +199,7 @@ export function drawCard(ctx: CanvasRenderingContext2D, input: CardInput, host: 
   ctx.fillStyle = C.muted;
   ctx.font = `400 18px ${SANS}`;
   ctx.fillText(V.temperature ? "Data: NASA POWER (MERRA-2) · NASA GISS GISTEMP v4" : `Data: NASA POWER, MERRA-2 based, monthly · ${V.name} (${V.code})`, M, 1226);
-  ctx.fillText("Grid cell ≈ 55 × 69 km, not a single station. Trends, not causes.", M, 1258);
+  ctx.fillText(`Grid cell ≈ ${cellText(input.lat)}, not a single station. Trends, not causes.`, M, 1258);
   ctx.fillStyle = C.text;
   ctx.font = `600 20px ${SANS}`;
   ctx.textAlign = "right";

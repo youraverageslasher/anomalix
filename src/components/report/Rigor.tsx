@@ -36,7 +36,8 @@ export function RigorRow({ d, variable }: { d: MainData; variable: VariableCode 
       acc ? (
         <>
           <span className="text-text">{PACE_LABELS[acc.pace].en.charAt(0).toUpperCase() + PACE_LABELS[acc.pace].en.slice(1)}</span>: last {acc.years} years ({acc.from}-{acc.to}){" "}
-          {signed(acc.recent.perDecade, V.digits)} ± {fixed(acc.recent.halfWidth, V.digits)} against {signed(acc.full, V.digits)} ± {fixed(acc.fullSe, V.digits)} (standard error) {du} for the full series
+          {signed(acc.recent.perDecade, V.digits)} ± {fixed(acc.recent.halfWidth, V.digits)} against {signed(acc.full, V.digits)} ± {fixed(acc.fullSe, V.digits)} (standard error) {du} for the full series{" "}
+          <span className="text-muted">(descriptive comparison, not a formal significance test)</span>
         </>
       ) : (
         <>The series is too short to compare its last {ACCEL_YEARS} years with the whole.</>

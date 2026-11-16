@@ -18,13 +18,14 @@ import { DEFAULT_VARIABLE, VARIABLES, VARIABLE_CODES } from "@/lib/data/variable
 import { CoverageMap } from "./CoverageMap";
 import { TwoSourcesFigure } from "@/components/report/TwoSources";
 import { utcDate } from "@/lib/data/origin";
+import { cellText } from "@/lib/data/cell";
 
 const STATE_VALUES = Object.fromEntries(grid.states.map((s) => [s.sigla, s.value]));
 const DEFAULT = { name: "São José do Rio Preto, SP", lat: -20.81, lon: -49.38 };
 const KM_PER_DEG = 111.32;
 
-const limits = (s: Span | null) => [
-  { title: "It is not a station.", body: "The cell covers a region about 55 by 69 km, not the thermometer downtown." },
+const limits = (s: Span | null, lat: number) => [
+  { title: "It is not a station.", body: `The cell covers a region about ${cellText(lat, " by ")} at this latitude, not the thermometer downtown.` },
   { title: "It is not a forecast.", body: `It describes what already happened${s ? `, ${s.from} to ${s.to}` : ""}. It says nothing about next year.` },
   { title: "It does not assign a cause.", body: "It measures how much and how surely a variable moved. Why it moved is a different question." },
   { title: "It can be inconclusive.", body: "When the test cannot separate signal from chance, the verdict says so. Not significant does not mean no trend." },
@@ -267,7 +268,7 @@ export function SourcesPage() {
             </h2>
           </div>
           <ol className="grid grid-cols-1 gap-px overflow-hidden rounded-card border border-rule bg-rule sm:grid-cols-2">
-            {limits(sa).map((l, i) => (
+            {limits(sa, place.lat).map((l, i) => (
               <Reveal as="li" key={l.title} className="limit-cell bg-card p-7 md:p-8">
                 <span className="font-serif text-[52px] leading-none text-muted tnum">0{i + 1}</span>
                 <p className="mt-6 font-serif text-[23px] leading-snug text-text">{l.title}</p>
